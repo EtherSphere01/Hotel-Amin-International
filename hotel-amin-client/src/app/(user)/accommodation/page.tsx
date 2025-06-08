@@ -157,7 +157,7 @@ export default function RoomCategoriesPage() {
 
   return (
   <>
-    <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-12">
+    <div className="max-w-7xl mx-auto space-y-12">
       {/* Hero Section */}
       <div className="relative w-full h-[300px]">
         <Image
@@ -165,7 +165,7 @@ export default function RoomCategoriesPage() {
           alt="Hero"
           layout="fill"
           objectFit="cover"
-          className="brightness-[0.4]"
+          className="brightness-[0.3]"
         />
         <div className="absolute inset-0 flex flex-col justify-center items-start px-4 sm:px-6 md:px-20 text-white">
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold">Accommodation</h1>
