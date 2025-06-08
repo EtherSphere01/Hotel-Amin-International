@@ -1,5 +1,11 @@
-export default function Home() {
+import Home from '@/component/Home';
+
+const page = () => {
   return (
-    <h1>Home page</h1>
+    <div>
+      <Home></Home>
+    </div>
   );
-}
+};
+
+export default page;

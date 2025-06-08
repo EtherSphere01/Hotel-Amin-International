@@ -156,6 +156,7 @@ export default function RoomCategoriesPage() {
       : roomData.filter((cat) => cat.category === selectedCategory);
 
   return (
+  <>
     <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-12">
       {/* Hero Section */}
       <div className="relative w-full h-[300px]">
@@ -277,5 +278,6 @@ export default function RoomCategoriesPage() {
         </div>
       ))}
     </div>
+  </>
   );
 }
