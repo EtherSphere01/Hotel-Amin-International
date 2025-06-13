@@ -1,0 +1,71 @@
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+  OneToMany,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { Booking } from '../../booking/entities/booking.entity';
+import { RoomItem } from './room-item.entity';
+import { HousekeepingHistory } from '../../housekeeping/entities/housekeeping-history.entity';
+import { Reservation } from '../../reservation/entities/reservation.entity';
+
+export enum RoomStatus {
+  AVAILABLE = 'available',
+  OCCUPIED = 'occupied',
+  MAINTENANCE = 'maintenance',
+  RESERVED = 'reserved',
+}
+
+export enum HousekeepingStatus {
+  CLEAN = 'clean',
+  WAITING_FOR_CLEAN = 'waiting_for_clean',
+  NEEDS_SERVICE = 'needs_service',
+}
+
+@Entity('Rooms')
+export class Rooms {
+  @PrimaryColumn()
+  room_num: number;
+
+  @Column()
+  floor: number;
+
+  @Column()
+  capacity: number;
+
+  @Column({ type: 'varchar', length: 50 })
+  type: string;
+
+  @Column({ type: 'text', nullable: true })
+  description?: string;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  room_price: number;
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
+  discount: number;
+
+  @Column({ type: 'enum', enum: RoomStatus })
+  room_status: RoomStatus;
+
+  @Column({ type: 'enum', enum: HousekeepingStatus })
+  housekeeping_status: HousekeepingStatus;
+
+  @ManyToOne(() => Booking, (booking) => booking.rooms, { nullable: true })
+  @JoinColumn({ name: 'booking_id' })
+  booking?: Booking;
+
+  @OneToMany(() => RoomItem, (roomItem) => roomItem.room)
+  roomItems: RoomItem[];
+
+  @OneToMany(() => HousekeepingHistory, (history) => history.room)
+  housekeepingHistory: HousekeepingHistory[];
+
+  @ManyToOne(() => Reservation, (reservation) => reservation.rooms, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'reservation_id' })
+  reservation?: Reservation;
+}
