@@ -7,7 +7,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
-// import type { Swiper as SwiperType } from "swiper";
+import type { Swiper as SwiperType } from "swiper";
 import { Navigation } from "swiper/modules";
 
 
@@ -193,10 +193,43 @@ const Home = () => {
       </div>
 
       {/* Accommodation Slider */}
-      <div className="py-14 px-4 md:px-16 lg:px-24 bg-white">
+      <div className="py-14 px-4 md:px-16 lg:px-24 bg-white relative">
         <h2 className="text-3xl font-bold text-blue-900 text-center mb-10">
           ACCOMMODATION
         </h2>
+
+        {/* Left arrow */}
+        <button
+          onClick={() => swiperRef.current?.slidePrev()}
+          className="flex items-center justify-center absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 hover:bg-white/90 shadow-lg p-3 rounded-full transition duration-300 backdrop-blur-sm cursor-pointer"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 text-blue-700"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
+        {/* Right arrow */}
+        <button
+          onClick={() => swiperRef.current?.slideNext()}
+          className="flex items-center justify-center absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20  hover:bg-white/90 shadow-lg p-3 rounded-full transition duration-300 backdrop-blur-sm cursor-pointer"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 text-blue-700"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+
         <Swiper
           onSwiper={(swiper) => (swiperRef.current = swiper)}
           onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
@@ -221,9 +254,7 @@ const Home = () => {
             <SwiperSlide key={index}>
               <div
                 onClick={() => swiperRef.current?.slideToLoop(index)}
-                className={`transition-all duration-300 ease-in-out w-full flex justify-center cursor-pointer ${activeIndex === index
-                  ? "scale-105 z-10"
-                  : "scale-95 opacity-60"
+                className={`transition-all duration-300 ease-in-out w-full flex justify-center cursor-pointer ${activeIndex === index ? "scale-105 z-10" : "scale-95 opacity-60"
                   }`}
               >
                 <div className="bg-white rounded-lg shadow-xl w-80">
@@ -313,30 +344,64 @@ const Home = () => {
           DISCOVER COX’S BAZAR
         </h2>
 
-        {/* Swiper navigation buttons */}
+        {/* Custom navigation buttons */}
         <button
-          className="discover-prev btn btn-circle btn-sm btn-warning absolute top-1/2 left-4 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center"
+          onClick={() => swiperRef.current?.slidePrev()}
+          disabled={swiperRef.current?.isBeginning}
+          className={`absolute top-1/2 left-2 sm:left-4 -translate-y-1/2 z-20 h-11 w-11 rounded-full text-white shadow-md transition duration-200 flex items-center justify-center ${swiperRef.current?.isBeginning
+            ? "bg-yellow-300 cursor-not-allowed opacity-50"
+            : "bg-[#F88600] hover:bg-[#e27c00] cursor-pointer"
+            }`}
           aria-label="Previous slide"
         >
-          &lt;
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
         </button>
+
         <button
-          className="discover-next btn btn-circle btn-sm btn-warning absolute top-1/2 right-4 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center"
+          onClick={() => swiperRef.current?.slideNext()}
+          disabled={swiperRef.current?.isEnd}
+          className={`absolute top-1/2 right-2 sm:right-4 -translate-y-1/2 z-20 h-11 w-11 rounded-full text-white shadow-md transition duration-200 flex items-center justify-center ${swiperRef.current?.isEnd
+            ? "bg-yellow-300 cursor-not-allowed opacity-50"
+            : "bg-[#F88600] hover:bg-[#e27c00] cursor-pointer"
+            }`}
           aria-label="Next slide"
         >
-          &gt;
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
         </button>
 
         <Swiper
-          navigation={{
-            prevEl: ".discover-prev",
-            nextEl: ".discover-next",
+          onSwiper={(swiper) => {
+            swiperRef.current = swiper;
           }}
+          onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
           modules={[Navigation, Autoplay]}
-          autoplay={{
-            delay: 3500,
-            disableOnInteraction: false,
-          }}
+          autoplay={{ delay: 3500, disableOnInteraction: false }}
           spaceBetween={20}
           breakpoints={{
             0: { slidesPerView: 1.1 },
@@ -361,7 +426,7 @@ const Home = () => {
                   <h3 className="text-lg font-bold text-gray-800 mb-1">{place.title}</h3>
                   <div className="flex items-center text-sm text-blue-800 mb-2 gap-1 ">
                     <FaStar className="text-yellow-400" />
-                    {place.rating}{" "}
+                    {place.rating}
                     <span className="text-gray-600 ml-1">({place.reviews} reviews)</span>
                   </div>
                   <p className="text-sm text-gray-600 mb-4">{place.description}</p>
@@ -378,6 +443,7 @@ const Home = () => {
           Discover More
         </button>
       </div>
+
 
       {/* Feedback Section */}
 
