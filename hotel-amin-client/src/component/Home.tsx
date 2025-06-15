@@ -133,10 +133,19 @@ const faqs = [
   },
 ];
 
-
 const Home = () => {
-  const [activeIndex, setActiveIndex] = useState(1);
+  const [activeIndex, setActiveIndex] = useState(0);
   const swiperRef = useRef < SwiperType | null > (null);
+
+  const handlePrev = () => {
+    if (!swiperRef.current) return;
+    swiperRef.current.slidePrev(500);
+  };
+
+  const handleNext = () => {
+    if (!swiperRef.current) return;
+    swiperRef.current.slideNext(500);
+  };
 
   return (
     <>
@@ -200,8 +209,9 @@ const Home = () => {
 
         {/* Left arrow */}
         <button
-          onClick={() => swiperRef.current?.slidePrev()}
+          onClick={handlePrev}
           className="flex items-center justify-center absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 hover:bg-white/90 shadow-lg p-3 rounded-full transition duration-300 backdrop-blur-sm cursor-pointer"
+          aria-label="Previous Slide"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -210,14 +220,20 @@ const Home = () => {
             viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
         </button>
 
         {/* Right arrow */}
         <button
-          onClick={() => swiperRef.current?.slideNext()}
-          className="flex items-center justify-center absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20  hover:bg-white/90 shadow-lg p-3 rounded-full transition duration-300 backdrop-blur-sm cursor-pointer"
+          onClick={handleNext}
+          className="flex items-center justify-center absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 hover:bg-white/90 shadow-lg p-3 rounded-full transition duration-300 backdrop-blur-sm cursor-pointer"
+          aria-label="Next Slide"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -226,7 +242,12 @@ const Home = () => {
             viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
           </svg>
         </button>
 
@@ -235,7 +256,7 @@ const Home = () => {
           onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
           slidesPerView={3}
           centeredSlides={true}
-          loop
+          loop={true}
           spaceBetween={30}
           autoplay={{
             delay: 3500,
@@ -253,8 +274,10 @@ const Home = () => {
           {accommodations.map((room, index) => (
             <SwiperSlide key={index}>
               <div
-                onClick={() => swiperRef.current?.slideToLoop(index)}
-                className={`transition-all duration-300 ease-in-out w-full flex justify-center cursor-pointer ${activeIndex === index ? "scale-105 z-10" : "scale-95 opacity-60"
+                onClick={() => swiperRef.current?.slideToLoop(index, 500)}
+                className={`transition-all duration-300 ease-in-out w-full flex justify-center cursor-pointer ${activeIndex === index
+                  ? "scale-105 z-10"
+                  : "scale-95 opacity-60"
                   }`}
               >
                 <div className="bg-white rounded-lg shadow-xl w-80">
@@ -309,10 +332,10 @@ const Home = () => {
       </div>
 
       {/*Services  Section */}
-      <h2 className="text-3xl font-bold text-blue-900 text-center mb-10">
-        HOTEL SERVICES AND FACILITIES
-      </h2>
       <div className="py-14 px-4 md:px-16 lg:px-24 bg-blue-50">
+        <h2 className="text-3xl font-bold text-blue-900 text-center mb-10">
+          HOTEL SERVICES AND FACILITIES
+        </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 text-center">
           {[
             { label: "Airport Pickup", icon: <FaShuttleVan className="text-3xl text-blue-700 mx-auto" /> },
@@ -444,9 +467,7 @@ const Home = () => {
         </button>
       </div>
 
-
       {/* Feedback Section */}
-
 
       {/* FAQ Section */}
       <div className="py-14 px-4 md:px-16 lg:px-24 bg-white">
