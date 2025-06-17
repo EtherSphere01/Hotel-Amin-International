@@ -1,14 +1,9 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React from "react";
 import Image from "next/image";
-import { FaCheckCircle } from "react-icons/fa";
 import "swiper/css";
 import "swiper/css/pagination";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Autoplay } from "swiper/modules";
-import type { Swiper as SwiperType } from "swiper";
-import { Navigation } from "swiper/modules";
 
 
 import {
@@ -28,90 +23,8 @@ import {
   FaHotTub,
   FaStar,
 } from "react-icons/fa";
-
-// Fake accommodations data
-const accommodations = [
-  {
-    title: "Family Suits Room",
-    img: "https://longbeachhotelbd.com/wp-content/uploads/2024/02/superior-deluxe-room-05.jpg",
-    price: "1,800/- TK, Per Night",
-    features: [
-      "Max 4 Adults",
-      "2 Large Beds",
-      "AC & Geyser",
-      "Spacious Interior",
-    ],
-  },
-  {
-    title: "Deluxe Couple Room",
-    img: "https://longbeachhotelbd.com/wp-content/uploads/2024/02/superior-deluxe-room-05.jpg",
-    price: "2,200/- TK, Per Night",
-    features: [
-      "Max 2 Adults + 1 Child",
-      "Bed Size (6 X 7 Feet)",
-      "AC & Geyser",
-      "Well Interior",
-    ],
-  },
-  {
-    title: "Premium Couple",
-    img: "https://longbeachhotelbd.com/wp-content/uploads/2024/02/superior-deluxe-room-05.jpg",
-    price: "2,800/- TK, Per Night",
-    features: [
-      "Max 2 Adults",
-      "Luxury Queen Bed",
-      "AC & Smart TV",
-      "Modern Interior",
-    ],
-  },
-  {
-    title: "Premium Couple",
-    img: "https://longbeachhotelbd.com/wp-content/uploads/2024/02/superior-deluxe-room-05.jpg",
-    price: "2,800/- TK, Per Night",
-    features: [
-      "Max 2 Adults",
-      "Luxury Queen Bed",
-      "AC & Smart TV",
-      "Modern Interior",
-    ],
-  },
-];
-
-// Fake discovery places data
-const places = [
-  {
-    title: "Inani Beach",
-    image: "https://www.solimarinternational.com/wp-content/uploads/sea-3243357_1280-1.jpg",
-    rating: 4.96,
-    reviews: 672,
-    description:
-      "I've been staying at this hotel in Cox’s Bazar for several years now, and it has truly become my go-to getaway spot.",
-  },
-  {
-    title: "Inani Beach 2",
-    image: "https://www.solimarinternational.com/wp-content/uploads/sea-3243357_1280-1.jpg",
-    rating: 4.96,
-    reviews: 672,
-    description:
-      "I've been staying at this hotel in Cox’s Bazar for several years now, and it has truly become my go-to getaway spot.",
-  },
-  {
-    title: "Mermaid Beach",
-    image: "https://www.solimarinternational.com/wp-content/uploads/sea-3243357_1280-1.jpg",
-    rating: 4.96,
-    reviews: 672,
-    description:
-      "I've been staying at this hotel in Cox’s Bazar for several years now, and it has truly become my go-to getaway spot.",
-  },
-  {
-    title: "Radient Fish World",
-    image: "https://www.solimarinternational.com/wp-content/uploads/sea-3243357_1280-1.jpg",
-    rating: 4.96,
-    reviews: 672,
-    description:
-      "I've been staying at this hotel in Cox’s Bazar for several years now, and it has truly become my go-to getaway spot.",
-  },
-];
+import AccommodationSlider from "./AccommodationSlider";
+import DiscoverSection from "./DiscoverySection";
 
 // Fake FAQs data
 const faqs = [
@@ -134,19 +47,6 @@ const faqs = [
 ];
 
 const Home = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const swiperRef = useRef < SwiperType | null > (null);
-
-  const handlePrev = () => {
-    if (!swiperRef.current) return;
-    swiperRef.current.slidePrev(500);
-  };
-
-  const handleNext = () => {
-    if (!swiperRef.current) return;
-    swiperRef.current.slideNext(500);
-  };
-
   return (
     <>
       {/* Hero Section */}
@@ -202,134 +102,7 @@ const Home = () => {
       </div>
 
       {/* Accommodation Slider */}
-      <div className="py-14 px-4 md:px-16 lg:px-24 bg-white relative">
-        <h2 className="text-3xl font-bold text-blue-900 text-center mb-10">
-          ACCOMMODATION
-        </h2>
-
-        {/* Left arrow */}
-        <button
-          onClick={handlePrev}
-          className="flex items-center justify-center absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 hover:bg-white/90 shadow-lg p-3 rounded-full transition duration-300 backdrop-blur-sm cursor-pointer"
-          aria-label="Previous Slide"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-blue-700"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
-
-        {/* Right arrow */}
-        <button
-          onClick={handleNext}
-          className="flex items-center justify-center absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 hover:bg-white/90 shadow-lg p-3 rounded-full transition duration-300 backdrop-blur-sm cursor-pointer"
-          aria-label="Next Slide"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-blue-700"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
-
-        <Swiper
-          onSwiper={(swiper) => (swiperRef.current = swiper)}
-          onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-          slidesPerView={3}
-          centeredSlides={true}
-          loop={true}
-          spaceBetween={30}
-          autoplay={{
-            delay: 3500,
-            disableOnInteraction: false,
-          }}
-          pagination={false}
-          modules={[Pagination, Autoplay]}
-          breakpoints={{
-            0: { slidesPerView: 1.1 },
-            640: { slidesPerView: 1.5 },
-            1024: { slidesPerView: 3 },
-          }}
-          className="pb-10"
-        >
-          {accommodations.map((room, index) => (
-            <SwiperSlide key={index}>
-              <div
-                onClick={() => swiperRef.current?.slideToLoop(index, 500)}
-                className={`transition-all duration-300 ease-in-out w-full flex justify-center cursor-pointer ${activeIndex === index
-                  ? "scale-105 z-10"
-                  : "scale-95 opacity-60"
-                  }`}
-              >
-                <div className="bg-white rounded-lg shadow-xl w-80">
-                  <div className="relative w-full h-48">
-                    <Image
-                      src={room.img}
-                      alt={room.title}
-                      fill
-                      className="object-cover rounded-t-lg"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      priority
-                    />
-                  </div>
-                  <div className="p-4 text-center">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                      {room.title}
-                    </h3>
-                    {activeIndex === index && (
-                      <>
-                        <p className="text-blue-900 font-bold text-sm mb-2">
-                          {room.price}
-                        </p>
-                        <ul className="text-left space-y-1 text-sm text-gray-700 mb-4">
-                          {room.features.map((feature, i) => (
-                            <li key={i} className="flex items-center gap-1">
-                              <FaCheckCircle className="text-blue-500 text-xs" />
-                              {feature}
-                            </li>
-                          ))}
-                        </ul>
-                        <div className="flex gap-2 justify-center">
-                          <button className="btn btn-warning btn-sm w-28">
-                            BOOK NOW
-                          </button>
-                          <button className="btn btn-outline btn-sm w-28">
-                            DETAILS
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-
-        {/* Custom pagination */}
-        <div className="text-center text-gray-600 font-medium mt-4">
-          {activeIndex + 1} / {accommodations.length}
-        </div>
-      </div>
+      <AccommodationSlider />
 
       {/*Services  Section */}
       <div className="py-14 px-4 md:px-16 lg:px-24 bg-blue-50">
@@ -362,110 +135,7 @@ const Home = () => {
       </div>
 
       {/* Discover Section */}
-      <div className="py-14 px-4 md:px-16 lg:px-24 bg-white text-center relative">
-        <h2 className="text-3xl font-bold text-blue-900 mb-10">
-          DISCOVER COX’S BAZAR
-        </h2>
-
-        {/* Custom navigation buttons */}
-        <button
-          onClick={() => swiperRef.current?.slidePrev()}
-          disabled={swiperRef.current?.isBeginning}
-          className={`absolute top-1/2 left-2 sm:left-4 -translate-y-1/2 z-20 h-11 w-11 rounded-full text-white shadow-md transition duration-200 flex items-center justify-center ${swiperRef.current?.isBeginning
-            ? "bg-yellow-300 cursor-not-allowed opacity-50"
-            : "bg-[#F88600] hover:bg-[#e27c00] cursor-pointer"
-            }`}
-          aria-label="Previous slide"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
-
-        <button
-          onClick={() => swiperRef.current?.slideNext()}
-          disabled={swiperRef.current?.isEnd}
-          className={`absolute top-1/2 right-2 sm:right-4 -translate-y-1/2 z-20 h-11 w-11 rounded-full text-white shadow-md transition duration-200 flex items-center justify-center ${swiperRef.current?.isEnd
-            ? "bg-yellow-300 cursor-not-allowed opacity-50"
-            : "bg-[#F88600] hover:bg-[#e27c00] cursor-pointer"
-            }`}
-          aria-label="Next slide"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
-
-        <Swiper
-          onSwiper={(swiper) => {
-            swiperRef.current = swiper;
-          }}
-          onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
-          modules={[Navigation, Autoplay]}
-          autoplay={{ delay: 3500, disableOnInteraction: false }}
-          spaceBetween={20}
-          breakpoints={{
-            0: { slidesPerView: 1.1 },
-            768: { slidesPerView: 2 },
-            1024: { slidesPerView: 3 },
-          }}
-          className="pb-8 max-w-6xl mx-auto"
-        >
-          {places.map((place, index) => (
-            <SwiperSlide key={index}>
-              <div className="rounded-xl overflow-hidden bg-white shadow-lg mb-6 mx-2">
-                <div className="relative w-full h-56">
-                  <Image
-                    src={place.image}
-                    alt={place.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
-                </div>
-                <div className="p-4 text-left">
-                  <h3 className="text-lg font-bold text-gray-800 mb-1">{place.title}</h3>
-                  <div className="flex items-center text-sm text-blue-800 mb-2 gap-1 ">
-                    <FaStar className="text-yellow-400" />
-                    {place.rating}
-                    <span className="text-gray-600 ml-1">({place.reviews} reviews)</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-4">{place.description}</p>
-                  <button className="btn btn-sm bg-[#F88600] rounded-full text-white">
-                    Read More
-                  </button>
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-
-        <button className="btn mt-6 bg-[#F88600] px-8 text-white font-semibold">
-          Discover More
-        </button>
-      </div>
+      <DiscoverSection />
 
       {/* Feedback Section */}
 

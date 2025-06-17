@@ -10,9 +10,9 @@ import { IoGlobeOutline } from 'react-icons/io5';
 const navLinks = [
   { name: 'Home', href: '/' },
   { name: 'Accommodation', href: '/accommodation' },
+  { name: 'Restaurants', href: '/restaurants' },
   { name: 'Offers', href: '/offers' },
   { name: 'Gallery', href: '/gallery' },
-  { name: 'Restaurants', href: '/restaurants' },
   { name: 'More', href: '/more' },
 ];
 
