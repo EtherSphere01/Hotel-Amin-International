@@ -4,7 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
-import { FaShoppingCart, FaBars, FaTimes, FaChevronDown } from "react-icons/fa";
+import {
+    FaShoppingCart,
+    FaBars,
+    FaTimes,
+    FaChevronDown,
+    FaUser,
+} from "react-icons/fa";
 import { IoGlobeOutline } from "react-icons/io5";
 import SignInPage from "@/app/(user)/auth/SignInPage";
 import SignUpPage from "@/app/(user)/auth/SignUpPage";
@@ -186,12 +192,21 @@ const HeaderUser = () => {
                             )}
                         </Link>
                         {isAuthenticated ? (
-                            <button
-                                onClick={handleLogout}
-                                className="bg-red-600 text-white text-sm font-semibold px-4 py-1 rounded hover:bg-red-700 transition"
-                            >
-                                Logout
-                            </button>
+                            <>
+                                <Link
+                                    href="/profile"
+                                    className="relative p-2 hover:bg-gray-700 rounded-full transition"
+                                    title="Profile"
+                                >
+                                    <FaUser className="text-white text-lg hover:text-yellow-400 transition" />
+                                </Link>
+                                <button
+                                    onClick={handleLogout}
+                                    className="bg-red-600 text-white text-sm font-semibold px-4 py-1 rounded hover:bg-red-700 transition"
+                                >
+                                    Logout
+                                </button>
+                            </>
                         ) : (
                             <>
                                 <button
@@ -262,12 +277,21 @@ const HeaderUser = () => {
                             </Link>
 
                             {isAuthenticated ? (
-                                <button
-                                    onClick={handleLogout}
-                                    className="bg-red-600 text-white text-sm font-semibold px-4 py-1 rounded hover:bg-red-700 transition"
-                                >
-                                    Logout
-                                </button>
+                                <>
+                                    <Link
+                                        href="/profile"
+                                        className="relative p-2 hover:bg-gray-700 rounded-full transition"
+                                        title="Profile"
+                                    >
+                                        <FaUser className="text-white text-lg hover:text-yellow-400 transition" />
+                                    </Link>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="bg-red-600 text-white text-sm font-semibold px-4 py-1 rounded hover:bg-red-700 transition"
+                                    >
+                                        Logout
+                                    </button>
+                                </>
                             ) : (
                                 <>
                                     <button
@@ -300,40 +324,6 @@ const HeaderUser = () => {
                                     <option value="ar">Arabic</option>
                                 </select>
                             </div>
-
-                            {/* Theme Toggle */}
-                            <label className="flex cursor-pointer gap-2 items-center">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="23"
-                                    height="25"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    <circle cx="12" cy="12" r="5" />
-                                    <path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />
-                                </svg>
-                                <input
-                                    type="checkbox"
-                                    value="synthwave"
-                                    className="toggle theme-controller bg-white"
-                                />
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="22"
-                                    height="25"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                                </svg>
-                            </label>
                         </div>
                     </div>
 
@@ -468,41 +458,16 @@ const HeaderUser = () => {
                             </Link>
 
                             {/* Cart */}
-                            <FaShoppingCart className="text-white text-lg cursor-pointer" />
-
-                            {/* Theme Toggle */}
-                            <label className="flex cursor-pointer gap-2 items-center mt-2">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="23"
-                                    height="25"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    <circle cx="12" cy="12" r="5" />
-                                    <path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />
-                                </svg>
-                                <input
-                                    type="checkbox"
-                                    value="synthwave"
-                                    className="toggle theme-controller bg-white"
-                                />
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="22"
-                                    height="25"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                                </svg>
-                            </label>
+                            <Link href="/cart" className="relative">
+                                <FaShoppingCart className="text-white text-lg cursor-pointer hover:text-yellow-400 transition" />
+                                {cartItemCount > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                        {cartItemCount > 99
+                                            ? "99+"
+                                            : cartItemCount}
+                                    </span>
+                                )}
+                            </Link>
                         </div>
                     )}
                 </div>

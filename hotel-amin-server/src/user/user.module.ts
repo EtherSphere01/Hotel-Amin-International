@@ -3,6 +3,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
+import { Reservation } from '../reservation/entities/reservation.entity';
 import { HashModule } from 'src/hash/hash.module';
 import { ConfigModule } from '@nestjs/config';
 import jwtConfig from 'src/auth/config/jwt.config';
@@ -23,7 +24,7 @@ import { EmailModule } from 'src/email/email.module';
     // },
   ],
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Reservation]),
     HashModule,
     EmailModule,
     // ConfigModule.forFeature(jwtConfig),

@@ -5,7 +5,9 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { HashingProvider } from 'src/hash/hashing.provider';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { EmailService } from 'src/email/email.service'; // Add this import
+import { UpdateProfileDto } from './dtos/update-profile.dto';
+import { EmailService } from 'src/email/email.service';
+import { Reservation } from '../reservation/entities/reservation.entity';
 import { join } from 'path';
 import { readFileSync } from 'fs';
 import * as ejs from 'ejs';
@@ -15,6 +17,8 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Reservation)
+    private readonly reservationRepository: Repository<Reservation>,
     private readonly hashProvider: HashingProvider,
     @Inject(EmailService)
     private readonly emailService: EmailService,
@@ -89,6 +93,45 @@ export class UserService {
     }
   }
 
+  // Update Profile (without password validation)----------------------------------------------------
+  public async updateProfile(
+    userId: number,
+    updateProfileDto: UpdateProfileDto,
+  ) {
+    const user = await this.userRepository.findOne({
+      where: { user_id: userId },
+    });
+
+    if (!user) {
+      return { message: 'User not found' };
+    }
+
+    // Check if phone number is being changed and if it already exists
+    if (updateProfileDto.phone && updateProfileDto.phone !== user.phone) {
+      const existPhone = await this.userRepository.findOne({
+        where: { phone: updateProfileDto.phone },
+      });
+      if (existPhone) {
+        return { message: 'Phone number already exists' };
+      }
+    }
+
+    // Update user fields
+    Object.assign(user, updateProfileDto);
+
+    try {
+      await this.userRepository.save(user);
+      // Remove password from response
+      const { password, ...userWithoutPassword } = user;
+      return {
+        message: 'Profile updated successfully',
+        user: userWithoutPassword,
+      };
+    } catch (error) {
+      return { message: 'Error updating profile', error };
+    }
+  }
+
   // Find User By Phone----------------------------------------------------
   public async findUserByPhone(phone: string) {
     try {
@@ -109,7 +152,12 @@ export class UserService {
         where: { user_id: id },
       });
 
-      return user ? user : null;
+      if (user) {
+        // Remove password from response for security
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      }
+      return null;
     } catch (error) {
       return error;
     }
@@ -152,6 +200,63 @@ export class UserService {
         subject: 'Welcome to Our Service!',
         html: `<p>Welcome ${email.split('@')[0]}!</p>`,
       });
+    }
+  }
+
+  // Get User Booking History----------------------------------------------------
+  public async getUserBookingHistory(userId: number) {
+    try {
+      console.log('Fetching booking history for user ID:', userId);
+
+      // First, let's check if there are any reservations at all for this user WITHOUT relations
+      const reservationsWithoutRelations =
+        await this.reservationRepository.find({
+          where: { user_id: userId },
+          order: { reservation_date: 'DESC' },
+        });
+
+      console.log(
+        'Found reservations without relations:',
+        reservationsWithoutRelations.length,
+      );
+
+      // Now try with relations
+      const reservations = await this.reservationRepository.find({
+        where: { user_id: userId },
+        relations: ['rooms'],
+        order: { reservation_date: 'DESC' },
+      });
+
+      console.log('Found reservations with relations:', reservations.length);
+      console.log('Reservations data:', JSON.stringify(reservations, null, 2));
+
+      // Also check if there are any reservations in the database at all
+      const allReservations = await this.reservationRepository.find();
+      console.log('Total reservations in database:', allReservations.length);
+
+      return reservations.map((reservation) => ({
+        booking_id: reservation.reservation_id,
+        checkin_date: reservation.checkin_date,
+        checkout_date: reservation.checkout_date,
+        number_of_guests: reservation.number_of_guests,
+        room_price: reservation.room_price,
+        discount_price: reservation.discount_price,
+        total_price: reservation.total_price,
+        booking_date: reservation.reservation_date,
+        payment_status: 'PAID',
+        typeOfBooking: reservation.typeOfBooking,
+        room:
+          reservation.rooms && reservation.rooms.length > 0
+            ? {
+                room_num: reservation.rooms[0].room_num,
+                type: reservation.rooms[0].type,
+                floor: reservation.rooms[0].floor,
+              }
+            : null,
+      }));
+    } catch (error) {
+      console.error('Error fetching booking history:', error);
+      return [];
     }
   }
 }
