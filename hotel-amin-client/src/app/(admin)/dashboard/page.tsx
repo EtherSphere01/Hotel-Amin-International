@@ -112,7 +112,7 @@ const App = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col lg:flex-row">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col lg:flex-row overflow-hidden">
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div 
@@ -124,7 +124,7 @@ const App = () => {
       {/* Sidebar */}
       <div className={`${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } lg:translate-x-0 fixed lg:relative z-50 lg:z-auto w-64 lg:w-68 transition-transform duration-300 bg-white shadow-xl border-r border-slate-200 flex flex-col h-full lg:h-auto`}>
+      } lg:translate-x-0 fixed lg:relative z-50 lg:z-auto w-64 lg:w-68 transition-transform duration-300 bg-white shadow-xl border-r border-slate-200 flex flex-col h-full lg:h-auto overflow-hidden`}>
         {/* Sidebar Header */}
         <div className="p-4 border-b border-slate-200">
           <div className="flex items-center justify-between">
@@ -171,14 +171,6 @@ const App = () => {
           ))}
         </nav>
 
-        {/* Sidebar Footer */}
-        <div className="p-4 border-t border-slate-200">
-          <div className="flex space-x-12">
-            <button className="p-2 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-              <Settings className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* Main Content */}
@@ -202,10 +194,6 @@ const App = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-2 lg:space-x-4">
-                <button className="relative p-2 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                  <Bell className="w-5 h-5 lg:w-6 lg:h-6" />
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 lg:w-5 lg:h-5 flex items-center justify-center">3</span>
-                </button>
                 <button className="p-2 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors hidden sm:block">
                   <LogOut className="w-5 h-5 lg:w-6 lg:h-6" />
                 </button>
@@ -216,53 +204,43 @@ const App = () => {
 
         {/* Stats Cards */}
         <div className="px-4 lg:px-6 py-4 lg:py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6 mb-6 lg:mb-8">
-            <div className="bg-white rounded-2xl shadow-lg p-4 lg:p-6 border border-slate-200 hover:shadow-xl transition-shadow">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-4 mb-6 lg:mb-8">
+            <div className="bg-white rounded-2xl shadow-lg p-3 lg:p-4 border border-slate-200 hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-slate-600 text-sm font-medium">Total Guests</p>
-                  <p className="text-2xl lg:text-3xl font-bold text-slate-800 mt-2">24</p>
-                  <p className="text-emerald-600 text-sm mt-1">↗ +12% from last week</p>
+                  <p className="text-slate-600 text-xs lg:text-sm font-medium">Available Rooms</p>
+                  <p className="text-xl lg:text-2xl font-bold text-slate-800 mt-1">8</p>
+                  <p className="text-amber-600 text-xs mt-1">16 occupied</p>
                 </div>
               </div>
             </div>
             
-            <div className="bg-white rounded-2xl shadow-lg p-4 lg:p-6 border border-slate-200 hover:shadow-xl transition-shadow">
+            <div className="bg-white rounded-2xl shadow-lg p-3 lg:p-4 border border-slate-200 hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-slate-600 text-sm font-medium">Available Rooms</p>
-                  <p className="text-2xl lg:text-3xl font-bold text-slate-800 mt-2">8</p>
-                  <p className="text-amber-600 text-sm mt-1">16 occupied</p>
+                  <p className="text-slate-600 text-xs lg:text-sm font-medium">Active Coupons</p>
+                  <p className="text-xl lg:text-2xl font-bold text-slate-800 mt-1">{coupons.filter(c => c.status === 'active').length}</p>
+                  <p className="text-orange-600 text-xs mt-1">{coupons.filter(c => c.status === 'expired').length} expired</p>
                 </div>
               </div>
             </div>
             
-            <div className="bg-white rounded-2xl shadow-lg p-4 lg:p-6 border border-slate-200 hover:shadow-xl transition-shadow">
+            <div className="bg-white rounded-2xl shadow-lg p-3 lg:p-4 border border-slate-200 hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-slate-600 text-sm font-medium">Active Coupons</p>
-                  <p className="text-2xl lg:text-3xl font-bold text-slate-800 mt-2">{coupons.filter(c => c.status === 'active').length}</p>
-                  <p className="text-orange-600 text-sm mt-1">{coupons.filter(c => c.status === 'expired').length} expired</p>
+                  <p className="text-slate-600 text-xs lg:text-sm font-medium">Active Offers</p>
+                  <p className="text-xl lg:text-2xl font-bold text-slate-800 mt-1">{offers.filter(o => o.status === 'active').length}</p>
+                  <p className="text-purple-600 text-xs mt-1">{offers.filter(o => o.status === 'expired').length} expired</p>
                 </div>
               </div>
             </div>
             
-            <div className="bg-white rounded-2xl shadow-lg p-4 lg:p-6 border border-slate-200 hover:shadow-xl transition-shadow">
+            <div className="bg-white rounded-2xl shadow-lg p-3 lg:p-4 border border-slate-200 hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-slate-600 text-sm font-medium">Active Offers</p>
-                  <p className="text-2xl lg:text-3xl font-bold text-slate-800 mt-2">{offers.filter(o => o.status === 'active').length}</p>
-                  <p className="text-purple-600 text-sm mt-1">{offers.filter(o => o.status === 'expired').length} expired</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-2xl shadow-lg p-4 lg:p-6 border border-slate-200 hover:shadow-xl transition-shadow">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-600 text-sm font-medium">Revenue Today</p>
-                  <p className="text-2xl lg:text-3xl font-bold text-slate-800 mt-2">$2,849</p>
-                  <p className="text-emerald-600 text-sm mt-1">↗ +15% from yesterday</p>
+                  <p className="text-slate-600 text-xs lg:text-sm font-medium">Revenue Today</p>
+                  <p className="text-xl lg:text-2xl font-bold text-slate-800 mt-1">$2,849</p>
+                  <p className="text-emerald-600 text-xs mt-1">↗ +15% from yesterday</p>
                 </div>
               </div>
             </div>
