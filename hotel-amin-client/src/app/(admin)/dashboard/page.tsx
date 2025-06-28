@@ -1925,7 +1925,7 @@ const App = () => {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar bar */}
       <div className={`${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } lg:translate-x-0 fixed lg:relative z-50 lg:z-auto w-64 lg:w-72 min-w-64 lg:min-w-72 max-w-64 lg:max-w-72 transition-transform duration-300 bg-white shadow-xl border-r border-slate-200 flex flex-col h-full lg:h-screen overflow-hidden`}>
