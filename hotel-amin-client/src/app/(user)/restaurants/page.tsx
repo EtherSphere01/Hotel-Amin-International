@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import DiscoverSection from '@/component/DiscoverySection';
+import ReusableSlider from '@/component/Slider';
 
 const menuItems = [
   {
@@ -28,6 +30,41 @@ const menuItems = [
     title: 'Snacks',
     image: 'https://images.unsplash.com/photo-1505253210343-d6d4fa8a0b9b?w=800&h=600&fit=crop',
     description: 'Light snacks and appetizers for any time',
+  },
+];
+
+const foods = [
+  {
+    title: "Food1",
+    image: "",
+    rating: 4.96,
+    reviews: 672,
+    description:
+      "I've been staying at this hotel in Cox’s Bazar for several years now, and it has truly become my go-to getaway spot.",
+  },
+  {
+    title: "Food22",
+    image: "",
+    rating: 4.96,
+    reviews: 672,
+    description:
+      "I've been staying at this hotel in Cox’s Bazar for several years now, and it has truly become my go-to getaway spot.",
+  },
+  {
+    title: "Food3",
+    image: "",
+    rating: 4.96,
+    reviews: 672,
+    description:
+      "I've been staying at this hotel in Cox’s Bazar for several years now, and it has truly become my go-to getaway spot.",
+  },
+  {
+    title: "Food4",
+    image: "",
+    rating: 4.96,
+    reviews: 672,
+    description:
+      "I've been staying at this hotel in Cox’s Bazar for several years now, and it has truly become my go-to getaway spot.",
   },
 ];
 
@@ -218,6 +255,21 @@ const MenuCard = ({ title, image, description, isActive }: MenuCardProps) => {
           ))}
         </div>
       </div>
+      <div className="w-100% px-4 md:px-16 lg:px-24 bg-white text-center py-10">
+        <h2 className="text-3xl font-bold text-blue-900 mb-10">
+        DISCOVER Crazy Foods
+        </h2>
+      </div>
+      <ReusableSlider data={foods} />;
+
+      <div className="w-100% px-4 md:px-16 lg:px-24 bg-white text-center py-10">
+        <h2 className="text-3xl font-bold text-blue-900 mb-10">
+        DISCOVER Hoooot Foods
+        </h2>
+      </div>
+      <ReusableSlider data={foods} />;
+
+      {/* Feedback Section */}
       
     </div>
   );

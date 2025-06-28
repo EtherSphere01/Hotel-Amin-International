@@ -46,6 +46,42 @@ const faqs = [
   },
 ];
 
+// Sample places data
+const places = [
+  {
+    title: "Inani Beach",
+    image: "https://www.solimarinternational.com/wp-content/uploads/sea-3243357_1280-1.jpg",
+    rating: 4.96,
+    reviews: 672,
+    description:
+      "I've been staying at this hotel in Cox’s Bazar for several years now, and it has truly become my go-to getaway spot.",
+  },
+  {
+    title: "Inani Beach 2",
+    image: "https://www.solimarinternational.com/wp-content/uploads/sea-3243357_1280-1.jpg",
+    rating: 4.96,
+    reviews: 672,
+    description:
+      "I've been staying at this hotel in Cox’s Bazar for several years now, and it has truly become my go-to getaway spot.",
+  },
+  {
+    title: "Mermaid Beach",
+    image: "https://www.solimarinternational.com/wp-content/uploads/sea-3243357_1280-1.jpg",
+    rating: 4.96,
+    reviews: 672,
+    description:
+      "I've been staying at this hotel in Cox’s Bazar for several years now, and it has truly become my go-to getaway spot.",
+  },
+  {
+    title: "Radient Fish World",
+    image: "https://www.solimarinternational.com/wp-content/uploads/sea-3243357_1280-1.jpg",
+    rating: 4.96,
+    reviews: 672,
+    description:
+      "I've been staying at this hotel in Cox’s Bazar for several years now, and it has truly become my go-to getaway spot.",
+  },
+];
+
 const Home = () => {
   return (
     <>
@@ -134,8 +170,13 @@ const Home = () => {
         </div>
       </div>
 
+      <div className="w-100% px-4 md:px-16 lg:px-24 bg-white text-center py-10">
+        <h2 className="text-3xl font-bold text-blue-900 mb-10">
+        DISCOVER COX’S BAZAR
+        </h2>
+      </div>
       {/* Discover Section */}
-      <DiscoverSection />
+      <DiscoverSection places={places} />
 
       {/* Feedback Section */}
 

@@ -13,7 +13,7 @@ const navLinks = [
   { name: 'Restaurants', href: '/restaurants' },
   { name: 'Offers', href: '/offers' },
   { name: 'Gallery', href: '/gallery' },
-  { name: 'More', href: '/more' },
+  { name: 'Contact Us', href: '/contact' },
 ];
 
 const HeaderUser = () => {
