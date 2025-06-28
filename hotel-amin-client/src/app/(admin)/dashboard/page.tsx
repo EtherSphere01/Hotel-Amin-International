@@ -1,9 +1,9 @@
 'use client';
 import React, { useState } from 'react';
-import { User, Bed, Utensils, Search, Plus, Edit2, Trash2, Save, X, Bell, Settings, LogOut, Calendar, DollarSign, Users, Home, Menu, Ticket } from "lucide-react";
+import { User, Bed, Utensils, Search, Plus, Edit2, Trash2, Save, X, Bell, Settings, LogOut, Calendar, DollarSign, Users, Home, Menu, Ticket, Gift } from "lucide-react";
 
 const App = () => {
-  const [activeTab, setActiveTab] = useState<'users' | 'rooms' | 'food' | 'coupons'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'rooms' | 'food' | 'coupons' | 'offers'>('users');
   const [sidebarOpen, setSidebarOpen] = useState(false); // Changed default to false for mobile-first
 
   // Sample data for display
@@ -27,6 +27,65 @@ const App = () => {
     { id: 4, name: 'Wine Selection', category: 'beverage', price: 15, description: 'Premium house wine selection', availability: true }
   ];
 
+  const offers = [
+    { 
+      id: 1, 
+      title: 'Summer Paradise Package', 
+      type: 'package', 
+      description: 'Enjoy 3 nights with breakfast, spa access, and complimentary dinner', 
+      price: 599, 
+      originalPrice: 799, 
+      discount: 25, 
+      validFrom: '2024-06-01', 
+      validUntil: '2024-08-31', 
+      status: 'active',
+      bookings: 24,
+      features: ['3 Nights Stay', 'Daily Breakfast', 'Spa Access', 'Welcome Dinner', 'Airport Transfer']
+    },
+    { 
+      id: 2, 
+      title: 'Business Traveler Deal', 
+      type: 'offer', 
+      description: 'Special rates for business guests with meeting room access', 
+      price: 189, 
+      originalPrice: 249, 
+      discount: 24, 
+      validFrom: '2024-01-01', 
+      validUntil: '2024-12-31', 
+      status: 'active',
+      bookings: 67,
+      features: ['Business Room', 'Free WiFi', 'Meeting Room Access', 'Late Checkout', 'Business Center']
+    },
+    { 
+      id: 3, 
+      title: 'Romantic Getaway', 
+      type: 'package', 
+      description: 'Perfect package for couples with champagne and rose petals', 
+      price: 459, 
+      originalPrice: 599, 
+      discount: 23, 
+      validFrom: '2024-02-01', 
+      validUntil: '2024-12-31', 
+      status: 'active',
+      bookings: 18,
+      features: ['Deluxe Suite', 'Champagne', 'Rose Petals', 'Couple Spa', 'Romantic Dinner']
+    },
+    { 
+      id: 4, 
+      title: 'Winter Holiday Special', 
+      type: 'offer', 
+      description: 'Expired holiday package with festive decorations', 
+      price: 299, 
+      originalPrice: 399, 
+      discount: 25, 
+      validFrom: '2023-12-01', 
+      validUntil: '2024-01-15', 
+      status: 'expired',
+      bookings: 45,
+      features: ['Holiday Suite', 'Festive Decor', 'Hot Chocolate', 'Holiday Dinner', 'Gift Basket']
+    }
+  ];
+
   const coupons = [
     { id: 1, code: 'WELCOME20', discount: 20, type: 'percentage', description: 'Welcome discount for new guests', validFrom: '2024-06-01', validUntil: '2024-12-31', status: 'active', usageCount: 45, maxUsage: 100 },
     { id: 2, code: 'SUMMER50', discount: 50, type: 'fixed', description: 'Summer special discount', validFrom: '2024-06-01', validUntil: '2024-08-31', status: 'active', usageCount: 23, maxUsage: 50 },
@@ -48,7 +107,8 @@ const App = () => {
     { key: 'users', label: 'User Management', icon: User, count: users.length },
     { key: 'rooms', label: 'Room Management', icon: Bed, count: rooms.length },
     { key: 'food', label: 'Food & Beverage', icon: Utensils, count: food.length },
-    { key: 'coupons', label: 'Coupon Management', icon: Ticket, count: coupons.length }
+    { key: 'coupons', label: 'Coupon Management', icon: Ticket, count: coupons.length },
+    { key: 'offers', label: 'Offers & Packages', icon: Gift, count: offers.length }
   ];
 
   return (
@@ -89,7 +149,7 @@ const App = () => {
             <button
               key={key}
               onClick={() => {
-                setActiveTab(key as 'users' | 'rooms' | 'food' | 'coupons');
+                setActiveTab(key as 'users' | 'rooms' | 'food' | 'coupons' | 'offers');
                 setSidebarOpen(false); // Close sidebar on mobile after selection
               }}
               className={`w-full flex items-center space-x-3 p-3 rounded-xl font-medium text-sm transition-all duration-200 ${
@@ -99,7 +159,7 @@ const App = () => {
               }`}
             >
               <Icon className="w-5 h-5 flex-shrink-0" />
-              <span className="flex-1 text-left">{label}</span>
+              <span className="flex-1 text-left whitespace-nowrap overflow-hidden text-ellipsis">{label}</span>
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                 activeTab === key 
                   ? 'bg-white/20 text-white' 
@@ -156,7 +216,7 @@ const App = () => {
 
         {/* Stats Cards */}
         <div className="px-4 lg:px-6 py-4 lg:py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6 mb-6 lg:mb-8">
             <div className="bg-white rounded-2xl shadow-lg p-4 lg:p-6 border border-slate-200 hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
@@ -183,6 +243,16 @@ const App = () => {
                   <p className="text-slate-600 text-sm font-medium">Active Coupons</p>
                   <p className="text-2xl lg:text-3xl font-bold text-slate-800 mt-2">{coupons.filter(c => c.status === 'active').length}</p>
                   <p className="text-orange-600 text-sm mt-1">{coupons.filter(c => c.status === 'expired').length} expired</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-2xl shadow-lg p-4 lg:p-6 border border-slate-200 hover:shadow-xl transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-600 text-sm font-medium">Active Offers</p>
+                  <p className="text-2xl lg:text-3xl font-bold text-slate-800 mt-2">{offers.filter(o => o.status === 'active').length}</p>
+                  <p className="text-purple-600 text-sm mt-1">{offers.filter(o => o.status === 'expired').length} expired</p>
                 </div>
               </div>
             </div>
@@ -531,6 +601,133 @@ const App = () => {
                                 : 'bg-amber-100 text-amber-800 border-amber-200'
                             }`}>
                               {coupon.status.charAt(0).toUpperCase() + coupon.status.slice(1)}
+                            </span>
+                          </div>
+                          
+                          <div className="flex space-x-2 pt-4 border-t border-slate-100">
+                            <button className="flex-1 bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 lg:px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
+                              <Edit2 className="w-4 h-4" />
+                              <span className="hidden sm:inline">Edit</span>
+                            </button>
+                            <button className="flex-1 bg-red-50 text-red-600 hover:bg-red-100 px-3 lg:px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
+                              <Trash2 className="w-4 h-4" />
+                              <span className="hidden sm:inline">Delete</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Offers & Packages Tab */}
+              {activeTab === 'offers' && (
+                <div className="space-y-6">
+                  <div className="flex flex-col gap-4">
+                    <div>
+                      <h2 className="text-xl lg:text-2xl font-bold text-slate-800">Offers & Packages</h2>
+                      <p className="text-slate-600 mt-1">Manage special offers and vacation packages</p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                        <input
+                          type="text"
+                          placeholder="Search offers and packages..."
+                          className="pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-slate-50 text-slate-700 placeholder-slate-400 w-full"
+                        />
+                      </div>
+                      <button className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-2.5 rounded-xl hover:from-purple-700 hover:to-purple-800 flex items-center justify-center space-x-2 font-medium shadow-lg hover:shadow-xl transition-all">
+                        <Plus className="w-5 h-5" />
+                        <span>Add Offer</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Offers Grid */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+                    {offers.map((offer) => (
+                      <div key={offer.id} className="bg-white rounded-xl shadow-lg border border-slate-200 hover:shadow-xl transition-shadow overflow-hidden">
+                        <div className="p-4 lg:p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-3 mb-2">
+                                <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-2 rounded-lg">
+                                  <Gift className="w-5 h-5 text-white" />
+                                </div>
+                                <div>
+                                  <h3 className="text-lg font-bold text-slate-800">{offer.title}</h3>
+                                  <div className="flex items-center space-x-2">
+                                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                                      offer.type === 'package' 
+                                        ? 'bg-purple-100 text-purple-700' 
+                                        : 'bg-blue-100 text-blue-700'
+                                    }`}>
+                                      {offer.type.toUpperCase()}
+                                    </span>
+                                    <span className="text-xs font-medium text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full">
+                                      {offer.discount}% OFF
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <p className="text-slate-600 text-sm leading-relaxed mb-3">{offer.description}</p>
+                            </div>
+                          </div>
+                          
+                          {/* Pricing */}
+                          <div className="flex items-center space-x-3 mb-4">
+                            <div className="text-2xl font-bold text-slate-800">${offer.price}</div>
+                            <div className="text-sm text-slate-500 line-through">${offer.originalPrice}</div>
+                            <div className="text-sm font-medium text-emerald-600">
+                              Save ${offer.originalPrice - offer.price}
+                            </div>
+                          </div>
+
+                          {/* Features */}
+                          <div className="mb-4">
+                            <p className="text-sm font-medium text-slate-700 mb-2">Includes:</p>
+                            <div className="grid grid-cols-1 gap-1">
+                              {offer.features.slice(0, 3).map((feature, index) => (
+                                <div key={index} className="flex items-center space-x-2 text-sm text-slate-600">
+                                  <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                                  <span>{feature}</span>
+                                </div>
+                              ))}
+                              {offer.features.length > 3 && (
+                                <div className="text-xs text-slate-500 mt-1">
+                                  +{offer.features.length - 3} more features
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Validity & Stats */}
+                          <div className="space-y-2 mb-4">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-slate-500">Valid From:</span>
+                              <span className="text-slate-700 font-medium">{offer.validFrom}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-slate-500">Valid Until:</span>
+                              <span className="text-slate-700 font-medium">{offer.validUntil}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-slate-500">Bookings:</span>
+                              <span className="text-slate-700 font-medium">{offer.bookings} guests</span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between mb-4">
+                            <span className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full border ${
+                              offer.status === 'active' 
+                                ? 'bg-emerald-100 text-emerald-800 border-emerald-200' 
+                                : offer.status === 'expired'
+                                ? 'bg-red-100 text-red-800 border-red-200'
+                                : 'bg-amber-100 text-amber-800 border-amber-200'
+                            }`}>
+                              {offer.status.charAt(0).toUpperCase() + offer.status.slice(1)}
                             </span>
                           </div>
                           
