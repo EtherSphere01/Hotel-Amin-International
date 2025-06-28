@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { RoomItem } from './entities/room-item.entity';
 import { create } from 'domain';
 import { CreateRoomDto } from './DTOs/create-room.dto';
+import { UpdateRoomDto } from './DTOs/update-room.dto';
 import { CreateRoomItemDto } from './DTOs/create-roomItem.dto';
 import { UpdateRoomStatusDto } from './DTOs/update-room-status.dto';
 import { UpdateHousekeepingStatusDto } from './DTOs/hk-status.dto';
@@ -36,10 +37,10 @@ export class RoomService {
     private readonly paginationProvider: PaginationProvider,
     @Inject(EmailService)
     private readonly emailService: EmailService,
-  ) {}
+  ) { }
 
   public async getAllRooms(roomQuery: GetRoomsDto): Promise<Paginated<Rooms>> {
-    let rooms = await this.paginationProvider.paginateQuery(
+    const rooms = await this.paginationProvider.paginateQuery(
       {
         limit: roomQuery.limit,
         page: roomQuery.page,
@@ -65,7 +66,7 @@ export class RoomService {
     roomNum: number,
     updateRoomStatusDto: UpdateRoomStatusDto,
   ) {
-    let room = await this.roomRepository.findOneBy({ room_num: roomNum });
+    const room = await this.roomRepository.findOneBy({ room_num: roomNum });
     if (!room) {
       throw new Error('Room not found');
     }
@@ -235,6 +236,29 @@ export class RoomService {
     return rooms;
   }
 
+<<<<<<< HEAD
+  public async updateRoom(room_num: number, updateRoomDto: UpdateRoomDto) {
+    const room = await this.roomRepository.findOne({ where: { room_num } });
+    if (!room) {
+      throw new NotFoundException(`Room with number ${room_num} not found`);
+    }
+
+    Object.assign(room, updateRoomDto);
+    return await this.roomRepository.save(room);
+  }
+
+  public async deleteRoom(room_num: number) {
+    const room = await this.roomRepository.findOne({ where: { room_num } });
+    if (!room) {
+      throw new NotFoundException(`Room with number ${room_num} not found`);
+    }
+
+    await this.roomRepository.remove(room);
+    return { message: `Room ${room_num} has been deleted successfully` };
+  }
+
+  private async sendIssueReportEmail(
+=======
   public async getRoomItems(roomNum: number) {
     const room = await this.roomRepository.findOne({
       where: { room_num: roomNum },
@@ -254,6 +278,7 @@ export class RoomService {
   }
 
   public async sendIssueReportEmail(
+>>>>>>> 05b74a8a7c22b94314e29564e041350049ca05ce
     email: string,
     roomNumber: number,
     itemName: string,

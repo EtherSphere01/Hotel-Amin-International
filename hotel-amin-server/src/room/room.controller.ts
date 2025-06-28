@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -13,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { RoomService } from './room.service';
 import { CreateRoomDto } from './DTOs/create-room.dto';
+import { UpdateRoomDto } from './DTOs/update-room.dto';
 import { CreateRoomItemDto } from './DTOs/create-roomItem.dto';
 import { UpdateRoomStatusDto } from './DTOs/update-room-status.dto';
 import { UpdateHousekeepingStatusDto } from './DTOs/hk-status.dto';
@@ -26,9 +28,9 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Controller('room')
 export class RoomController {
-  constructor(private readonly roomService: RoomService) {}
+  constructor(private readonly roomService: RoomService) { }
 
-  @Roles('admin', 'customer')
+  @Auth(AuthType.None)
   @Get('all')
   public getAllRooms(@Query() roomQuery: GetRoomsDto) {
     return this.roomService.getAllRooms(roomQuery);
@@ -66,7 +68,16 @@ export class RoomController {
     );
   }
 
-  @Roles('admin')
+  @Auth(AuthType.None)
+  @Put('update/:room_num')
+  public updateRoom(
+    @Param('room_num', ParseIntPipe) roomNum: number,
+    @Body() updateRoomDto: UpdateRoomDto,
+  ) {
+    return this.roomService.updateRoom(roomNum, updateRoomDto);
+  }
+
+  @Auth(AuthType.None)
   @Put('update-status/:room_num')
   public updateRoomStatus(
     @Param('room_num', ParseIntPipe) roomNum: number,
@@ -95,6 +106,11 @@ export class RoomController {
   }
 
   @Auth(AuthType.None)
+<<<<<<< HEAD
+  @Delete('delete/:room_num')
+  public deleteRoom(@Param('room_num', ParseIntPipe) roomNum: number) {
+    return this.roomService.deleteRoom(roomNum);
+=======
   @Get(':room_num/items')
   public getRoomItems(@Param('room_num', ParseIntPipe) roomNum: number) {
     return this.roomService.getRoomItems(roomNum);
@@ -110,5 +126,6 @@ export class RoomController {
       searchDto.checkOut,
       searchDto.guests,
     );
+>>>>>>> 05b74a8a7c22b94314e29564e041350049ca05ce
   }
 }

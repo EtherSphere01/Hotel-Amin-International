@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { CouponService } from './coupon.service';
 import { CreateCouponDto } from './DTOs/create-coupon.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
@@ -7,9 +15,9 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Controller('coupon')
 export class CouponController {
-  constructor(private readonly couponService: CouponService) {}
+  constructor(private readonly couponService: CouponService) { }
 
-  @Roles('admin', 'customer')
+  @Auth(AuthType.None)
   @Get('all')
   public getCoupons() {
     return this.couponService.getAllCoupons();
@@ -37,9 +45,21 @@ export class CouponController {
     return await this.couponService.getCouponByCode(coupon_code);
   }
 
-  @Roles('admin')
-  @Delete('delete/:coupon_name')
-  public async deleteCoupon(@Body('coupon_name') coupon_name: string) {
-    return await this.couponService.deleteCoupon(coupon_name);
+  @Auth(AuthType.None)
+  @Put('update/:coupon_id')
+  public async updateCoupon(
+    @Param('coupon_id') coupon_id: number,
+    @Body() updateCouponDto: CreateCouponDto,
+  ) {
+    return await this.couponService.updateCouponData(
+      coupon_id,
+      updateCouponDto,
+    );
+  }
+
+  @Auth(AuthType.None)
+  @Delete('delete/:coupon_code')
+  public async deleteCoupon(@Param('coupon_code') coupon_code: string) {
+    return await this.couponService.deleteCoupon(coupon_code);
   }
 }
