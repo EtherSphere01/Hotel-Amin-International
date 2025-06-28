@@ -37,7 +37,7 @@ export class RoomService {
     private readonly paginationProvider: PaginationProvider,
     @Inject(EmailService)
     private readonly emailService: EmailService,
-  ) { }
+  ) {}
 
   public async getAllRooms(roomQuery: GetRoomsDto): Promise<Paginated<Rooms>> {
     const rooms = await this.paginationProvider.paginateQuery(
@@ -236,7 +236,6 @@ export class RoomService {
     return rooms;
   }
 
-<<<<<<< HEAD
   public async updateRoom(room_num: number, updateRoomDto: UpdateRoomDto) {
     const room = await this.roomRepository.findOne({ where: { room_num } });
     if (!room) {
@@ -257,8 +256,6 @@ export class RoomService {
     return { message: `Room ${room_num} has been deleted successfully` };
   }
 
-  private async sendIssueReportEmail(
-=======
   public async getRoomItems(roomNum: number) {
     const room = await this.roomRepository.findOne({
       where: { room_num: roomNum },
@@ -278,7 +275,6 @@ export class RoomService {
   }
 
   public async sendIssueReportEmail(
->>>>>>> 05b74a8a7c22b94314e29564e041350049ca05ce
     email: string,
     roomNumber: number,
     itemName: string,

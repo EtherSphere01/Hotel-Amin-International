@@ -22,7 +22,7 @@ export class UserService {
     private readonly hashProvider: HashingProvider,
     @Inject(EmailService)
     private readonly emailService: EmailService,
-  ) { }
+  ) {}
 
   // Create User----------------------------------------------------
   public async createUser(createUserDto: CreateUserDto) {
@@ -203,7 +203,6 @@ export class UserService {
     }
   }
 
-<<<<<<< HEAD
   // Get User Booking History----------------------------------------------------
   public async getUserBookingHistory(userId: number) {
     try {
@@ -258,7 +257,9 @@ export class UserService {
     } catch (error) {
       console.error('Error fetching booking history:', error);
       return [];
-=======
+    }
+  }
+
   // Get All Users----------------------------------------------------
   public async getAllUsers() {
     try {
@@ -368,7 +369,6 @@ export class UserService {
       return { message: 'User deleted successfully' };
     } catch (error) {
       return { message: 'Error deleting user', error };
->>>>>>> e4dadff4dfd08ba44011bb6ec253583dbe2e1498
     }
   }
 }
