@@ -8,6 +8,7 @@ import "swiper/css/pagination";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 
 const fallbackAccommodations = [
@@ -61,6 +62,7 @@ const AccommodationSlider = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const swiperRef = useRef<SwiperType | null>(null);
     const [accommodationData, setAccommodationData] = useState<any[]>([]);
+    const router = useRouter();
 
     useEffect(() => {
         const fetchAccommodationData = async () => {
@@ -78,6 +80,14 @@ const AccommodationSlider = () => {
 
     const handlePrev = () => swiperRef.current?.slidePrev(500);
     const handleNext = () => swiperRef.current?.slideNext(500);
+
+    const handleBookNow = (roomId: number) => {
+        router.push(`/accommodation/${roomId}`);
+    };
+
+    const handleDetails = (roomId: number) => {
+        router.push(`/accommodation/${roomId}`);
+    };
 
     const displayData =
         accommodationData.length > 0
@@ -197,10 +207,24 @@ const AccommodationSlider = () => {
                                                 )}
                                             </ul>
                                             <div className="flex gap-2 justify-center">
-                                                <button className="btn btn-warning btn-sm w-28">
+                                                <button
+                                                    onClick={() =>
+                                                        handleBookNow(
+                                                            room.id || index
+                                                        )
+                                                    }
+                                                    className="btn btn-warning btn-sm w-28"
+                                                >
                                                     BOOK NOW
                                                 </button>
-                                                <button className="btn btn-outline btn-sm w-28">
+                                                <button
+                                                    onClick={() =>
+                                                        handleDetails(
+                                                            room.id || index
+                                                        )
+                                                    }
+                                                    className="btn btn-outline btn-sm w-28"
+                                                >
                                                     DETAILS
                                                 </button>
                                             </div>

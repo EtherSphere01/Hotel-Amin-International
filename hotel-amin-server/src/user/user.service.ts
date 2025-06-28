@@ -102,6 +102,19 @@ export class UserService {
     }
   }
 
+  // Find User By ID----------------------------------------------------
+  public async findUserById(id: number) {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { user_id: id },
+      });
+
+      return user ? user : null;
+    } catch (error) {
+      return error;
+    }
+  }
+
   // Welcome Mail----------------------------------------------------
 
   private async sendWelcomeEmail(email: string, createUserDto?: CreateUserDto) {

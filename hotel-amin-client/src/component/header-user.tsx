@@ -9,6 +9,7 @@ import { IoGlobeOutline } from "react-icons/io5";
 import SignInPage from "@/app/(user)/auth/SignInPage";
 import SignUpPage from "@/app/(user)/auth/SignUpPage";
 import { decodeJWT, singOut, getToken } from "@/app/utilities/jwt-operation";
+import { getCartItemCount } from "@/app/utilities/cart-utils";
 import { toast } from "react-toastify";
 
 const navLinks = [
@@ -18,6 +19,7 @@ const navLinks = [
     { name: "Offers", href: "/offers" },
     { name: "Gallery", href: "/gallery" },
     { name: "Contact Us", href: "/contact" },
+    { name: "Cart", href: "/cart" },
 ];
 
 const HeaderUser = () => {
@@ -25,6 +27,7 @@ const HeaderUser = () => {
     const [signupButton, setSignUpButton] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user, setUser] = useState<any>(null);
+    const [cartItemCount, setCartItemCount] = useState(0);
     const modalRef = useRef<HTMLDivElement>(null);
 
     // Check authentication status
@@ -43,6 +46,12 @@ const HeaderUser = () => {
             setIsAuthenticated(false);
             setUser(null);
         }
+    };
+
+    // Update cart item count
+    const updateCartCount = () => {
+        const count = getCartItemCount();
+        setCartItemCount(count);
     };
 
     // Handle logout
@@ -67,6 +76,22 @@ const HeaderUser = () => {
     // Check auth status on component mount
     useEffect(() => {
         checkAuthStatus();
+        updateCartCount();
+
+        // Listen for storage changes to update cart count
+        const handleStorageChange = () => {
+            updateCartCount();
+        };
+
+        window.addEventListener("storage", handleStorageChange);
+
+        // Also listen for custom cart update events
+        window.addEventListener("cartUpdated", handleStorageChange);
+
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+            window.removeEventListener("cartUpdated", handleStorageChange);
+        };
     }, []);
 
     const handleSignInButton = (value: boolean) => {
@@ -137,6 +162,15 @@ const HeaderUser = () => {
 
                     {/* Mobile Right Section */}
                     <div className="md:hidden flex items-center gap-3">
+                        {/* Mobile Cart Icon */}
+                        <Link href="/cart" className="relative">
+                            <FaShoppingCart className="text-white text-lg cursor-pointer hover:text-yellow-400 transition" />
+                            {cartItemCount > 0 && (
+                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                    {cartItemCount > 99 ? "99+" : cartItemCount}
+                                </span>
+                            )}
+                        </Link>
                         {isAuthenticated ? (
                             <button
                                 onClick={handleLogout}
@@ -200,7 +234,17 @@ const HeaderUser = () => {
 
                         {/* Desktop buttons */}
                         <div className="hidden md:flex flex-wrap gap-2 sm:gap-3 items-center justify-center md:justify-end w-full md:w-auto">
-                            <FaShoppingCart className="text-white text-lg cursor-pointer" />
+                            {/* Cart Icon with Badge */}
+                            <Link href="/cart" className="relative">
+                                <FaShoppingCart className="text-white text-lg cursor-pointer hover:text-yellow-400 transition" />
+                                {cartItemCount > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                        {cartItemCount > 99
+                                            ? "99+"
+                                            : cartItemCount}
+                                    </span>
+                                )}
+                            </Link>
 
                             {isAuthenticated ? (
                                 <button

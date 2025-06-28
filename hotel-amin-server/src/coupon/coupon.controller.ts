@@ -31,7 +31,7 @@ export class CouponController {
     return await this.couponService.createCoupon(createCouponDto);
   }
 
-  @Roles('admin', 'customer')
+  @Auth(AuthType.None)
   @Get('search/:coupon_code')
   public async getCouponByCode(@Param('coupon_code') coupon_code: string) {
     return await this.couponService.getCouponByCode(coupon_code);

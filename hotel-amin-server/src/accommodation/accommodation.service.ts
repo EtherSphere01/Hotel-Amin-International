@@ -23,4 +23,16 @@ export class AccommodationService {
   async findAll(): Promise<Accommodation[]> {
     return this.accommodationRepository.find();
   }
+
+  async findOne(id: number): Promise<Accommodation> {
+    const accommodation = await this.accommodationRepository.findOne({
+      where: { id },
+    });
+
+    if (!accommodation) {
+      throw new Error(`Accommodation with ID ${id} not found`);
+    }
+
+    return accommodation;
+  }
 }

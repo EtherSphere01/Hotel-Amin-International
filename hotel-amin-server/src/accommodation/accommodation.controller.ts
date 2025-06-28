@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param } from '@nestjs/common';
 import { AccommodationService } from './accommodation.service';
 import { CreateAccommodationDto } from './DTOs/create-accommodation.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
@@ -17,5 +17,10 @@ export class AccommodationController {
   @Get('all')
   findAll() {
     return this.accommodationService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.accommodationService.findOne(+id);
   }
 }

@@ -13,6 +13,8 @@ import {
 } from './entities/booking.entity';
 import { Accounts, PaymentType } from './entities/accounts.entity';
 import { CreateBookingDto } from './DTOs/create-booking.dto';
+import { CreateAccommodationBookingDto } from './DTOs/create-accommodation-booking.dto';
+import { CreateGuestBookingDto } from './DTOs/create-guest-booking.dto';
 import { Coupon } from '../coupon/entities/coupon.entity'; // Import Coupon entity
 import { CouponUsage } from '../coupon/entities/coupon-usage.entity'; // Import CouponUsage entity
 import { CouponService } from 'src/coupon/coupon.service';
@@ -20,6 +22,7 @@ import { RoomService } from 'src/room/room.service';
 import { Rooms, RoomStatus } from 'src/room/entities/room.entity';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
+import { Accommodation } from 'src/accommodation/accommodation.entity';
 
 @Injectable()
 export class BookingService {
@@ -42,6 +45,9 @@ export class BookingService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     public readonly userService: UserService,
+
+    @InjectRepository(Accommodation)
+    private readonly accommodationRepository: Repository<Accommodation>,
   ) {}
 
   async createBooking(dto: CreateBookingDto) {
@@ -155,6 +161,30 @@ export class BookingService {
 
     const savedBooking = await this.bookingRepo.save(booking);
 
+    // Create coupon usage record if coupon was used
+    if (couponCode) {
+      try {
+        const couponUsage = this.couponUsageRepo.create({
+          coupon_code: couponCode.coupon_code,
+          used_at: new Date(),
+          coupon: couponCode,
+          booking: savedBooking,
+        });
+        await this.couponUsageRepo.save(couponUsage);
+      } catch (error) {
+        // If there's a unique constraint error, log it but don't fail the booking
+        // This handles the case where the database still has the unique constraint
+        if (error.code === '23505') {
+          console.log(
+            `Coupon usage already recorded for: ${couponCode.coupon_code}`,
+          );
+        } else {
+          // For other errors, re-throw
+          throw error;
+        }
+      }
+    }
+
     allRooms.forEach(async (room) => {
       if (room?.room_num) {
         await this.roomService.updateBookingId(room.room_num, savedBooking);
@@ -189,4 +219,275 @@ export class BookingService {
   }
 
   async confirmReservation(booking: Booking) {}
+
+  async createAccommodationBooking(
+    dto: CreateAccommodationBookingDto,
+    userId: number,
+  ) {
+    // Get accommodation details
+    const accommodation = await this.accommodationRepository.findOne({
+      where: { id: dto.accommodation_id },
+    });
+
+    if (!accommodation) {
+      throw new HttpException(
+        `Accommodation with ID ${dto.accommodation_id} not found.`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Find available rooms of the accommodation type
+    const availableRooms = await this.roomRepository.find({
+      where: {
+        type: accommodation.category,
+        room_status: RoomStatus.AVAILABLE,
+      },
+      take: dto.no_of_rooms,
+    });
+
+    if (availableRooms.length < dto.no_of_rooms) {
+      throw new HttpException(
+        `Not enough available rooms of type ${accommodation.category}. Available: ${availableRooms.length}, Requested: ${dto.no_of_rooms}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Calculate booking details
+    const timeDifference =
+      dto.checkout_date.getTime() - dto.checkin_date.getTime();
+    const numberOfDays = Math.max(1, timeDifference / (1000 * 3600 * 24));
+
+    // Use accommodation price as base price
+    let totalPrice = accommodation.price * dto.no_of_rooms * numberOfDays;
+    let couponDiscount = 0;
+    let mainCoupon = 0;
+    let couponCode: Coupon | null = null;
+
+    // Handle coupon if provided
+    if (dto.coupon_code) {
+      const coupon = await this.couponService.getCouponByCode(dto.coupon_code);
+
+      if (!coupon) {
+        throw new HttpException(
+          `Coupon with code ${dto.coupon_code} not found.`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      if (coupon?.is_active === false || coupon?.quantity === 0) {
+        throw new HttpException(
+          `Coupon with code ${dto.coupon_code} is expired.`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      couponCode = coupon;
+      mainCoupon = coupon.coupon_percent;
+      couponDiscount = Math.round((totalPrice * coupon?.coupon_percent) / 100);
+
+      await this.couponService.updateCoupon(
+        coupon.coupon_code,
+        coupon.coupon_id,
+      );
+    }
+
+    // Get user details
+    const user = await this.userRepository.findOne({
+      where: { user_id: userId },
+    });
+
+    if (!user) {
+      throw new HttpException('User not found.', HttpStatus.BAD_REQUEST);
+    }
+
+    // Create booking
+    const booking = this.bookingRepo.create({
+      checkin_date: dto.checkin_date,
+      checkout_date: dto.checkout_date,
+      number_of_guests: dto.number_of_guests,
+      room_price: totalPrice,
+      coupon_percent: mainCoupon,
+      total_price:
+        couponDiscount === 0 ? totalPrice : totalPrice - couponDiscount,
+      payment_status: dto.payment_status,
+      booking_date: new Date(),
+      typeOfBooking: dto.typeOfBooking,
+      no_of_rooms: dto.no_of_rooms,
+      user_phone: user.phone,
+      coupon: couponCode || undefined,
+    });
+
+    const savedBooking = await this.bookingRepo.save(booking);
+
+    // Assign rooms to booking and update room status
+    const roomNumbers = availableRooms
+      .slice(0, dto.no_of_rooms)
+      .map((room) => room.room_num);
+
+    for (const room of availableRooms.slice(0, dto.no_of_rooms)) {
+      await this.roomService.updateBookingId(room.room_num, savedBooking);
+    }
+
+    return {
+      ...savedBooking,
+      accommodation: accommodation,
+      assignedRooms: roomNumbers,
+    };
+  }
+
+  async createGuestBooking(dto: CreateGuestBookingDto) {
+    // Get accommodation details
+    const accommodation = await this.accommodationRepository.findOne({
+      where: { id: dto.accommodation_id },
+    });
+
+    if (!accommodation) {
+      throw new HttpException(
+        `Accommodation with ID ${dto.accommodation_id} not found.`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Find available rooms of the accommodation type
+    const availableRooms = await this.roomRepository.find({
+      where: {
+        type: accommodation.category,
+        room_status: RoomStatus.AVAILABLE,
+      },
+      take: dto.no_of_rooms,
+    });
+
+    if (availableRooms.length < dto.no_of_rooms) {
+      throw new HttpException(
+        `Not enough available rooms of type ${accommodation.category}. Available: ${availableRooms.length}, Requested: ${dto.no_of_rooms}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Calculate booking details
+    const timeDifference =
+      dto.checkout_date.getTime() - dto.checkin_date.getTime();
+    const numberOfDays = Math.max(1, timeDifference / (1000 * 3600 * 24));
+
+    // Use accommodation price as base price
+    let totalPrice = accommodation.price * dto.no_of_rooms * numberOfDays;
+    let couponDiscount = 0;
+    let mainCoupon = 0;
+    let couponCode: Coupon | null = null;
+
+    // Handle coupon if provided
+    if (dto.coupon_code) {
+      const coupon = await this.couponService.getCouponByCode(dto.coupon_code);
+
+      if (!coupon) {
+        throw new HttpException(
+          `Coupon with code ${dto.coupon_code} not found.`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      if (coupon?.is_active === false || coupon?.quantity === 0) {
+        throw new HttpException(
+          `Coupon with code ${dto.coupon_code} is expired.`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      couponCode = coupon;
+      mainCoupon = coupon.coupon_percent;
+      couponDiscount = Math.round((totalPrice * coupon?.coupon_percent) / 100);
+
+      await this.couponService.updateCoupon(
+        coupon.coupon_code,
+        coupon.coupon_id,
+      );
+    }
+
+    // Create or find guest user
+    let user = await this.userRepository.findOne({
+      where: { phone: dto.guest_mobile },
+    });
+
+    if (!user) {
+      user = this.userRepository.create({
+        name: dto.guest_name,
+        email: `guest_${dto.guest_mobile}@hotelamin.com`,
+        password: 'guest_password_' + Date.now(),
+        phone: dto.guest_mobile,
+        address: dto.guest_address,
+        nid: dto.guest_passport_nid,
+        passport: dto.guest_passport_nid,
+        nationality: dto.guest_nationality,
+        profession: dto.guest_profession,
+        age: parseInt(dto.guest_age),
+        maritalStatus: false,
+        vehicleNo: dto.guest_vehicle_no || '',
+        fatherName: dto.guest_father_name,
+        registrationDate: new Date(),
+        role: 'guest',
+      });
+      await this.userRepository.save(user);
+    }
+
+    // Create booking
+    const booking = this.bookingRepo.create({
+      checkin_date: dto.checkin_date,
+      checkout_date: dto.checkout_date,
+      number_of_guests: dto.number_of_guests,
+      room_price: totalPrice,
+      coupon_percent: mainCoupon,
+      total_price:
+        couponDiscount === 0 ? totalPrice : totalPrice - couponDiscount,
+      payment_status: dto.payment_status,
+      booking_date: new Date(),
+      typeOfBooking: dto.typeOfBooking,
+      no_of_rooms: dto.no_of_rooms,
+      user_phone: user.phone,
+      coupon: couponCode || undefined,
+    });
+
+    const savedBooking = await this.bookingRepo.save(booking);
+
+    // Create coupon usage record if coupon was used
+    if (couponCode) {
+      try {
+        const couponUsage = this.couponUsageRepo.create({
+          coupon_code: couponCode.coupon_code,
+          used_at: new Date(),
+          coupon: couponCode,
+          booking: savedBooking,
+        });
+        await this.couponUsageRepo.save(couponUsage);
+      } catch (error) {
+        // If there's a unique constraint error, log it but don't fail the booking
+        // This handles the case where the database still has the unique constraint
+        if (error.code === '23505') {
+          console.log(
+            `Coupon usage already recorded for: ${couponCode.coupon_code}`,
+          );
+        } else {
+          // For other errors, re-throw
+          throw error;
+        }
+      }
+    }
+
+    // Assign rooms to booking and update room status
+    const roomNumbers = availableRooms
+      .slice(0, dto.no_of_rooms)
+      .map((room) => room.room_num);
+
+    for (const room of availableRooms.slice(0, dto.no_of_rooms)) {
+      await this.roomService.updateBookingId(room.room_num, savedBooking);
+    }
+
+    return {
+      ...savedBooking,
+      accommodation: accommodation,
+      assignedRooms: roomNumbers,
+      guestInfo: {
+        name: dto.guest_name,
+        mobile: dto.guest_mobile,
+        type: dto.guest_type,
+      },
+    };
+  }
 }

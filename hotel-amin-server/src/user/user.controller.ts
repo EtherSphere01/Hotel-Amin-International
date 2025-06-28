@@ -3,6 +3,7 @@ import {
   Controller,
   Patch,
   Post,
+  Get,
   SetMetadata,
   UseGuards,
 } from '@nestjs/common';
@@ -13,6 +14,8 @@ import { AccessTokenGuard } from 'src/auth/guards/access-token/access-token.guar
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { AuthType } from 'src/auth/enums/auth-type.enum';
 import { Roles } from 'src/auth/decorators/roles.decorator';
+import { ActiveUser } from 'src/auth/decorators/active-user.decorator';
+import { ActiveUserData } from 'src/auth/interfaces/active-user-data.interface';
 
 // @UseGuards(AccessTokenGuard)
 @Controller('user')
@@ -29,5 +32,11 @@ export class UserController {
   @Roles('customer')
   async updateUser(@Body() updateUserDto: UpdateUserDto) {
     return this.userService.updateUser(updateUserDto);
+  }
+
+  @Get('profile')
+  @Auth(AuthType.Bearer)
+  async getProfile(@ActiveUser() user: ActiveUserData) {
+    return this.userService.findUserById(user.sub);
   }
 }
