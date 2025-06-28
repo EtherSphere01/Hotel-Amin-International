@@ -1,9 +1,9 @@
 'use client';
 import React, { useState } from 'react';
-import { User, Bed, Utensils, Search, Plus, Edit2, Trash2, Save, X, Bell, Settings, LogOut, Calendar, DollarSign, Users, Home, Menu } from "lucide-react";
+import { User, Bed, Utensils, Search, Plus, Edit2, Trash2, Save, X, Bell, Settings, LogOut, Calendar, DollarSign, Users, Home, Menu, Ticket } from "lucide-react";
 
 const App = () => {
-  const [activeTab, setActiveTab] = useState<'users' | 'rooms' | 'food'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'rooms' | 'food' | 'coupons'>('users');
   const [sidebarOpen, setSidebarOpen] = useState(false); // Changed default to false for mobile-first
 
   // Sample data for display
@@ -27,6 +27,13 @@ const App = () => {
     { id: 4, name: 'Wine Selection', category: 'beverage', price: 15, description: 'Premium house wine selection', availability: true }
   ];
 
+  const coupons = [
+    { id: 1, code: 'WELCOME20', discount: 20, type: 'percentage', description: 'Welcome discount for new guests', validFrom: '2024-06-01', validUntil: '2024-12-31', status: 'active', usageCount: 45, maxUsage: 100 },
+    { id: 2, code: 'SUMMER50', discount: 50, type: 'fixed', description: 'Summer special discount', validFrom: '2024-06-01', validUntil: '2024-08-31', status: 'active', usageCount: 23, maxUsage: 50 },
+    { id: 3, code: 'FAMILY15', discount: 15, type: 'percentage', description: 'Family package discount', validFrom: '2024-01-01', validUntil: '2024-12-31', status: 'active', usageCount: 78, maxUsage: 200 },
+    { id: 4, code: 'EXPIRED10', discount: 10, type: 'percentage', description: 'Expired promotional code', validFrom: '2024-01-01', validUntil: '2024-05-31', status: 'expired', usageCount: 120, maxUsage: 100 }
+  ];
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': case 'available': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
@@ -40,7 +47,8 @@ const App = () => {
   const sidebarItems = [
     { key: 'users', label: 'User Management', icon: User, count: users.length },
     { key: 'rooms', label: 'Room Management', icon: Bed, count: rooms.length },
-    { key: 'food', label: 'Food & Beverage', icon: Utensils, count: food.length }
+    { key: 'food', label: 'Food & Beverage', icon: Utensils, count: food.length },
+    { key: 'coupons', label: 'Coupon Management', icon: Ticket, count: coupons.length }
   ];
 
   return (
@@ -81,7 +89,7 @@ const App = () => {
             <button
               key={key}
               onClick={() => {
-                setActiveTab(key as any);
+                setActiveTab(key as 'users' | 'rooms' | 'food' | 'coupons');
                 setSidebarOpen(false); // Close sidebar on mobile after selection
               }}
               className={`w-full flex items-center space-x-3 p-3 rounded-xl font-medium text-sm transition-all duration-200 ${
@@ -172,9 +180,9 @@ const App = () => {
             <div className="bg-white rounded-2xl shadow-lg p-4 lg:p-6 border border-slate-200 hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-slate-600 text-sm font-medium">Food Orders</p>
-                  <p className="text-2xl lg:text-3xl font-bold text-slate-800 mt-2">42</p>
-                  <p className="text-emerald-600 text-sm mt-1">↗ +8% today</p>
+                  <p className="text-slate-600 text-sm font-medium">Active Coupons</p>
+                  <p className="text-2xl lg:text-3xl font-bold text-slate-800 mt-2">{coupons.filter(c => c.status === 'active').length}</p>
+                  <p className="text-orange-600 text-sm mt-1">{coupons.filter(c => c.status === 'expired').length} expired</p>
                 </div>
               </div>
             </div>
@@ -315,7 +323,7 @@ const App = () => {
                   </div>
 
                   {/* Rooms Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                     {rooms.map((room) => (
                       <div key={room.id} className="bg-white rounded-xl shadow-lg border border-slate-200 hover:shadow-xl transition-shadow overflow-hidden">
                         <div className="p-4 lg:p-6">
@@ -417,6 +425,112 @@ const App = () => {
                                 : 'bg-red-100 text-red-800 border-red-200'
                             }`}>
                               {item.availability ? 'Available' : 'Unavailable'}
+                            </span>
+                          </div>
+                          
+                          <div className="flex space-x-2 pt-4 border-t border-slate-100">
+                            <button className="flex-1 bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 lg:px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
+                              <Edit2 className="w-4 h-4" />
+                              <span className="hidden sm:inline">Edit</span>
+                            </button>
+                            <button className="flex-1 bg-red-50 text-red-600 hover:bg-red-100 px-3 lg:px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
+                              <Trash2 className="w-4 h-4" />
+                              <span className="hidden sm:inline">Delete</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Coupons Tab */}
+              {activeTab === 'coupons' && (
+                <div className="space-y-6">
+                  <div className="flex flex-col gap-4">
+                    <div>
+                      <h2 className="text-xl lg:text-2xl font-bold text-slate-800">Coupon Management</h2>
+                      <p className="text-slate-600 mt-1">Manage discount coupons and promotional codes</p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                        <input
+                          type="text"
+                          placeholder="Search coupons..."
+                          className="pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-slate-50 text-slate-700 placeholder-slate-400 w-full"
+                        />
+                      </div>
+                      <button className="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-2.5 rounded-xl hover:from-orange-700 hover:to-orange-800 flex items-center justify-center space-x-2 font-medium shadow-lg hover:shadow-xl transition-all">
+                        <Plus className="w-5 h-5" />
+                        <span>Add Coupon</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Coupons Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+                    {coupons.map((coupon) => (
+                      <div key={coupon.id} className="bg-white rounded-xl shadow-lg border border-slate-200 hover:shadow-xl transition-shadow overflow-hidden">
+                        <div className="p-4 lg:p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-3 mb-2">
+                                <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-2 rounded-lg">
+                                  <Ticket className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+                                </div>
+                                <div>
+                                  <h3 className="text-base lg:text-lg font-bold text-slate-800">{coupon.code}</h3>
+                                  <div className="flex items-center space-x-2">
+                                    <span className="text-lg font-bold text-orange-600">
+                                      {coupon.type === 'percentage' ? `${coupon.discount}%` : `$${coupon.discount}`}
+                                    </span>
+                                    <span className="text-xs text-slate-500">
+                                      {coupon.type === 'percentage' ? 'OFF' : 'DISCOUNT'}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <p className="text-slate-600 text-sm leading-relaxed mb-3">{coupon.description}</p>
+                            </div>
+                          </div>
+                          
+                          {/* Validity Period */}
+                          <div className="space-y-2 mb-4">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-slate-500">Valid From:</span>
+                              <span className="text-slate-700 font-medium">{coupon.validFrom}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-slate-500">Valid Until:</span>
+                              <span className="text-slate-700 font-medium">{coupon.validUntil}</span>
+                            </div>
+                          </div>
+
+                          {/* Usage Statistics */}
+                          <div className="mb-4">
+                            <div className="flex items-center justify-between text-sm mb-2">
+                              <span className="text-slate-500">Usage:</span>
+                              <span className="text-slate-700 font-medium">{coupon.usageCount}/{coupon.maxUsage}</span>
+                            </div>
+                            <div className="w-full bg-slate-200 rounded-full h-2">
+                              <div 
+                                className="bg-orange-500 h-2 rounded-full transition-all duration-300" 
+                                style={{ width: `${Math.min((coupon.usageCount / coupon.maxUsage) * 100, 100)}%` }}
+                              ></div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between mb-4">
+                            <span className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full border ${
+                              coupon.status === 'active' 
+                                ? 'bg-emerald-100 text-emerald-800 border-emerald-200' 
+                                : coupon.status === 'expired'
+                                ? 'bg-red-100 text-red-800 border-red-200'
+                                : 'bg-amber-100 text-amber-800 border-amber-200'
+                            }`}>
+                              {coupon.status.charAt(0).toUpperCase() + coupon.status.slice(1)}
                             </span>
                           </div>
                           
