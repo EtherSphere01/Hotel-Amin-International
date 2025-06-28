@@ -30,6 +30,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { EmailModule } from './email/email.module';
 import { ConfigModule } from '@nestjs/config';
 import { PdfModule } from './pdf/pdf.module';
+import { AccommodationModule } from './accommodation/accommodation.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { PdfModule } from './pdf/pdf.module';
     FeedbackModule,
     ReservationModule,
     UserModule,
+    AccommodationModule,
     ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [],
@@ -70,6 +72,7 @@ import { PdfModule } from './pdf/pdf.module';
     EmailModule,
     ConfigModule.forRoot(),
     PdfModule,
+    AccommodationModule,
   ],
   controllers: [AppController],
   providers: [
