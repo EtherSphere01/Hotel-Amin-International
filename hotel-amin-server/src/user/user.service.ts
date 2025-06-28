@@ -18,7 +18,7 @@ export class UserService {
     private readonly hashProvider: HashingProvider,
     @Inject(EmailService)
     private readonly emailService: EmailService,
-  ) {}
+  ) { }
 
   // Create User----------------------------------------------------
   public async createUser(createUserDto: CreateUserDto) {
@@ -30,7 +30,7 @@ export class UserService {
       return { message: 'User already exists' };
     }
 
-    let validUser = createUserDto;
+    const validUser = createUserDto;
     validUser.registrationDate = new Date();
     validUser.password = await this.hashProvider.hashPassword(
       createUserDto.password,
@@ -139,6 +139,118 @@ export class UserService {
         subject: 'Welcome to Our Service!',
         html: `<p>Welcome ${email.split('@')[0]}!</p>`,
       });
+    }
+  }
+
+  // Get All Users----------------------------------------------------
+  public async getAllUsers() {
+    try {
+      const users = await this.userRepository.find({
+        select: [
+          'user_id',
+          'name',
+          'email',
+          'phone',
+          'address',
+          'nationality',
+          'profession',
+          'age',
+          'registrationDate',
+          'role',
+        ],
+      });
+      return users;
+    } catch (error) {
+      return { message: 'Error fetching users', error };
+    }
+  }
+
+  // Get User By ID----------------------------------------------------
+  public async getUserById(id: number) {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { user_id: id },
+        select: [
+          'user_id',
+          'name',
+          'email',
+          'phone',
+          'address',
+          'nid',
+          'passport',
+          'nationality',
+          'profession',
+          'age',
+          'maritalStatus',
+          'vehicleNo',
+          'fatherName',
+          'registrationDate',
+          'role',
+        ],
+      });
+
+      if (!user) {
+        return { message: 'User not found' };
+      }
+
+      return user;
+    } catch (error) {
+      return { message: 'Error fetching user', error };
+    }
+  }
+
+  // Update User By ID (Admin)----------------------------------------------------
+  public async updateUserById(id: number, updateData: any) {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { user_id: id },
+      });
+
+      if (!user) {
+        return { message: 'User not found' };
+      }
+
+      // Hash password if provided
+      if (updateData.password) {
+        updateData.password = await this.hashProvider.hashPassword(
+          updateData.password,
+        );
+      }
+
+      // Check if phone is being changed and if it already exists
+      if (updateData.phone && updateData.phone !== user.phone) {
+        const existingPhone = await this.userRepository.findOne({
+          where: { phone: updateData.phone },
+        });
+        if (existingPhone) {
+          return { message: 'Phone number already exists' };
+        }
+      }
+
+      Object.assign(user, updateData);
+      await this.userRepository.save(user);
+
+      return { message: 'User updated successfully', user };
+    } catch (error) {
+      return { message: 'Error updating user', error };
+    }
+  }
+
+  // Delete User----------------------------------------------------
+  public async deleteUser(id: number) {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { user_id: id },
+      });
+
+      if (!user) {
+        return { message: 'User not found' };
+      }
+
+      await this.userRepository.remove(user);
+      return { message: 'User deleted successfully' };
+    } catch (error) {
+      return { message: 'Error deleting user', error };
     }
   }
 }

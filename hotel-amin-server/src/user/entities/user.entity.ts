@@ -32,8 +32,8 @@ export class User {
   @Column({ type: 'varchar', length: 50, nullable: false })
   nid: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: false })
-  passport: string;
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  passport?: string;
 
   @Column({ type: 'varchar', length: 50, nullable: false })
   nationality: string;

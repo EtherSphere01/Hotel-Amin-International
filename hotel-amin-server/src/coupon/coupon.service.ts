@@ -16,7 +16,7 @@ export class CouponService {
     private readonly couponUsageRepository: Repository<CouponUsage>,
     @InjectRepository(Employee)
     private readonly employeeRepository: Repository<Employee>,
-  ) {}
+  ) { }
 
   @Cron(CronExpression.EVERY_5_MINUTES)
   async handleExpiredCoupons() {
@@ -87,6 +87,20 @@ export class CouponService {
     }
     await this.couponRepository.remove(coupon);
     return { message: 'Coupon deleted successfully' };
+  }
+
+  public async updateCouponData(
+    coupon_id: number,
+    updateData: Partial<CreateCouponDto>,
+  ) {
+    const existingCoupon = await this.couponRepository.findOne({
+      where: { coupon_id },
+    });
+    if (!existingCoupon) {
+      throw new NotFoundException(`Coupon with ID '${coupon_id}' not found`);
+    }
+    await this.couponRepository.update(coupon_id, updateData);
+    return await this.couponRepository.findOne({ where: { coupon_id } });
   }
 
   public async updateCoupon(coupon_code: string, coupon_id: number) {

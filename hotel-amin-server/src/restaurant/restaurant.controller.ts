@@ -34,11 +34,13 @@ export class RestaurantController {
         return this.restaurantService.getMenuItemById(+id);
     }
 
+    @Auth(AuthType.None)
     @Patch('menu/:id')
     updateMenuItem(@Param('id') id: number, @Body() body: CreateMenuItemDto) {
         return this.restaurantService.updateMenuItem(+id, body);
     }
 
+    @Auth(AuthType.None)
     @Delete('menu/:id')
     deleteMenuItem(@Param('id') id: number) {
         return this.restaurantService.deleteMenuItem(+id);
