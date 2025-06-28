@@ -125,7 +125,7 @@ export class BookingService {
         nid: dto.user_phone,
         passport: dto.user_phone,
         nationality: 'Bangladeshi',
-        Profession: 'Software Engineer',
+        profession: 'Software Engineer',
         age: 30,
         maritalStatus: true,
         vehicleNo: dto.user_phone,
@@ -188,7 +188,5 @@ export class BookingService {
     return this.bookingRepo.remove(booking);
   }
 
-  async confirmReservation(booking: Booking) {
-    
-  }
+  async confirmReservation(booking: Booking) {}
 }

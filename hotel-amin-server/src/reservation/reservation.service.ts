@@ -67,7 +67,7 @@ export class ReservationService {
         nid: phone,
         passport: phone,
         nationality: 'Bangladeshi',
-        Profession: 'Software Engineer',
+        profession: 'Software Engineer',
         age: 30,
         maritalStatus: true,
         vehicleNo: phone,

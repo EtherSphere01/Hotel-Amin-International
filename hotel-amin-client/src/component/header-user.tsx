@@ -8,6 +8,8 @@ import { FaShoppingCart, FaBars, FaTimes } from "react-icons/fa";
 import { IoGlobeOutline } from "react-icons/io5";
 import SignInPage from "@/app/(user)/auth/SignInPage";
 import SignUpPage from "@/app/(user)/auth/SignUpPage";
+import { decodeJWT, singOut, getToken } from "@/app/utilities/jwt-operation";
+import { toast } from "react-toastify";
 
 const navLinks = [
     { name: "Home", href: "/" },
@@ -21,7 +23,51 @@ const navLinks = [
 const HeaderUser = () => {
     const [signinButton, setSignInButton] = useState(false);
     const [signupButton, setSignUpButton] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [user, setUser] = useState<any>(null);
     const modalRef = useRef<HTMLDivElement>(null);
+
+    // Check authentication status
+    const checkAuthStatus = () => {
+        const token = localStorage.getItem("accessToken");
+        if (token) {
+            const userInfo = decodeJWT();
+            if (userInfo) {
+                setIsAuthenticated(true);
+                setUser(userInfo);
+            } else {
+                setIsAuthenticated(false);
+                setUser(null);
+            }
+        } else {
+            setIsAuthenticated(false);
+            setUser(null);
+        }
+    };
+
+    // Handle logout
+    const handleLogout = async () => {
+        try {
+            await singOut();
+            setIsAuthenticated(false);
+            setUser(null);
+            toast.success("Logged out successfully!");
+        } catch (error) {
+            toast.error("Error logging out");
+        }
+    };
+
+    // Handle successful signin/signup
+    const handleAuthSuccess = () => {
+        setSignInButton(false);
+        setSignUpButton(false);
+        checkAuthStatus();
+    };
+
+    // Check auth status on component mount
+    useEffect(() => {
+        checkAuthStatus();
+    }, []);
 
     const handleSignInButton = (value: boolean) => {
         console.log("Sign In button clicked:", value);
@@ -91,19 +137,34 @@ const HeaderUser = () => {
 
                     {/* Mobile Right Section */}
                     <div className="md:hidden flex items-center gap-3">
-                        <button
-                            onClick={() => handleSignInButton(!signinButton)}
-                            className="bg-[#F5A623] text-white text-sm font-semibold px-4 py-1 rounded hover:bg-[#e49b1a] transition"
-                        >
-                            Sign In
-                        </button>
+                        {isAuthenticated ? (
+                            <button
+                                onClick={handleLogout}
+                                className="bg-red-600 text-white text-sm font-semibold px-4 py-1 rounded hover:bg-red-700 transition"
+                            >
+                                Logout
+                            </button>
+                        ) : (
+                            <>
+                                <button
+                                    onClick={() =>
+                                        handleSignInButton(!signinButton)
+                                    }
+                                    className="bg-[#F5A623] text-white text-sm font-semibold px-4 py-1 rounded hover:bg-[#e49b1a] transition"
+                                >
+                                    Sign In
+                                </button>
 
-                        <button
-                            onClick={() => handleSignUpButton(!signupButton)}
-                            className="bg-blue-600 text-white text-sm font-semibold px-4 py-1 rounded hover:bg-blue-700 transition"
-                        >
-                            Sign Up
-                        </button>
+                                <button
+                                    onClick={() =>
+                                        handleSignUpButton(!signupButton)
+                                    }
+                                    className="bg-blue-600 text-white text-sm font-semibold px-4 py-1 rounded hover:bg-blue-700 transition"
+                                >
+                                    Sign Up
+                                </button>
+                            </>
+                        )}
 
                         {/* Language Dropdown */}
                         <div className="flex items-center gap-2 bg-gray-200 text-black text-sm px-3 py-1 rounded">
@@ -141,23 +202,34 @@ const HeaderUser = () => {
                         <div className="hidden md:flex flex-wrap gap-2 sm:gap-3 items-center justify-center md:justify-end w-full md:w-auto">
                             <FaShoppingCart className="text-white text-lg cursor-pointer" />
 
-                            <button
-                                onClick={() =>
-                                    handleSignInButton(!signinButton)
-                                }
-                                className="bg-[#F5A623] text-white text-sm font-semibold px-4 py-1 rounded hover:bg-[#e49b1a] transition"
-                            >
-                                Sign In
-                            </button>
+                            {isAuthenticated ? (
+                                <button
+                                    onClick={handleLogout}
+                                    className="bg-red-600 text-white text-sm font-semibold px-4 py-1 rounded hover:bg-red-700 transition"
+                                >
+                                    Logout
+                                </button>
+                            ) : (
+                                <>
+                                    <button
+                                        onClick={() =>
+                                            handleSignInButton(!signinButton)
+                                        }
+                                        className="bg-[#F5A623] text-white text-sm font-semibold px-4 py-1 rounded hover:bg-[#e49b1a] transition"
+                                    >
+                                        Sign In
+                                    </button>
 
-                            <button
-                                onClick={() =>
-                                    handleSignUpButton(!signupButton)
-                                }
-                                className="bg-blue-600 text-white text-sm font-semibold px-4 py-1 rounded hover:bg-blue-700 transition"
-                            >
-                                Sign Up
-                            </button>
+                                    <button
+                                        onClick={() =>
+                                            handleSignUpButton(!signupButton)
+                                        }
+                                        className="bg-blue-600 text-white text-sm font-semibold px-4 py-1 rounded hover:bg-blue-700 transition"
+                                    >
+                                        Sign Up
+                                    </button>
+                                </>
+                            )}
 
                             {/* Language Dropdown */}
                             <div className="flex items-center gap-2 bg-gray-200 text-black text-sm px-3 py-1 rounded">
@@ -308,6 +380,7 @@ const HeaderUser = () => {
                                     setSignInButton(false);
                                     setSignUpButton(true);
                                 }}
+                                onAuthSuccess={handleAuthSuccess}
                             />
                         </div>
                     </div>
@@ -337,6 +410,7 @@ const HeaderUser = () => {
                                     setSignUpButton(false);
                                     setSignInButton(true);
                                 }}
+                                onAuthSuccess={handleAuthSuccess}
                             />
                         </div>
                     </div>

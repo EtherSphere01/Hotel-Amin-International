@@ -39,7 +39,7 @@ export class User {
   nationality: string;
 
   @Column({ type: 'varchar', length: 50, nullable: false })
-  Profession: string;
+  profession: string;
 
   @Column({ type: 'integer', nullable: false })
   age: number;

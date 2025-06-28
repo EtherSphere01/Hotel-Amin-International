@@ -21,7 +21,7 @@ export class CreateUserDto {
   @IsOptional()
   @IsEmail()
   @MaxLength(100)
-  email: string;
+  email?: string;
 
   @IsNotEmpty()
   @MinLength(8)
@@ -51,10 +51,10 @@ export class CreateUserDto {
   @MinLength(5)
   nid: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(50)
   @MinLength(5)
-  passport: string;
+  passport?: string;
 
   @IsNotEmpty()
   @MaxLength(50)
@@ -64,7 +64,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   @MaxLength(50)
   @MinLength(5)
-  Profession: string;
+  profession: string;
 
   @IsInt()
   @Min(0)

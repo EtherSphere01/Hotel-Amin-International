@@ -10,40 +10,42 @@ import { useRouter } from "next/navigation";
 interface SignInPageProps {
     onClose?: () => void;
     onSwitchToSignUp?: () => void;
+    onAuthSuccess?: () => void;
 }
 
 export default function SignInPage({
     onClose,
     onSwitchToSignUp,
+    onAuthSuccess,
 }: SignInPageProps) {
-    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
     const [user, setUser] = useState("");
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
 
-    const validateEmail = (email: string) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
+    const validatePhone = (phone: string) => {
+        const bdPhoneRegex = /^(\+880|880|0)?1[3-9]\d{8}$/;
+        if (!bdPhoneRegex.test(phone.replace(/\s|-/g, ""))) {
             setErrors((prev) => ({
                 ...prev,
-                email: "Please enter a valid email address",
+                phone: "Enter a valid phone number (e.g., +8801XXXXXXXXX)",
             }));
         } else {
             setErrors((prev) => {
                 const newErrors = { ...prev };
-                delete newErrors.email;
+                delete newErrors.phone;
                 return newErrors;
             });
         }
     };
 
     const validatePassword = (password: string) => {
-        if (password.length < 6) {
+        if (password.length < 8) {
             setErrors((prev) => ({
                 ...prev,
-                password: "Password must be at least 6 characters",
+                password: "Password must be at least 8 characters",
             }));
         } else {
             setErrors((prev) => {
@@ -61,8 +63,8 @@ export default function SignInPage({
             (async () => {
                 try {
                     const res = await axios.post(
-                        `${process.env.NEXT_PUBLIC_LOCALHOST}/auth/signin`,
-                        { email, password }
+                        `http://localhost:3000/auth/signin`,
+                        { phone, password }
                     );
                     const { data } = res;
 
@@ -71,7 +73,7 @@ export default function SignInPage({
                             data.accessToken,
                             data.refreshToken
                         );
-                        setEmail("");
+                        setPhone("");
                         setPassword("");
                         const user = decodeJWT();
                         // const signedInUser = {
@@ -85,6 +87,11 @@ export default function SignInPage({
                         // Close modal if onClose prop is provided
                         if (onClose) {
                             onClose();
+                        }
+
+                        // Call auth success callback
+                        if (onAuthSuccess) {
+                            onAuthSuccess();
                         }
 
                         if (role === "admin") {
@@ -140,30 +147,30 @@ export default function SignInPage({
                     <form className="space-y-6" onSubmit={handleOnSubmit}>
                         <div>
                             <label
-                                htmlFor="email"
+                                htmlFor="phone"
                                 className="block font-medium text-gray-800 mb-2"
                             >
-                                Email
+                                Phone
                             </label>
                             <input
-                                type="email"
-                                name="email"
-                                placeholder="enter your email"
+                                type="tel"
+                                name="phone"
+                                placeholder="enter your phone number"
                                 required
-                                value={email}
+                                value={phone}
                                 onChange={(e) => {
-                                    setEmail(e.target.value);
-                                    validateEmail(e.target.value);
+                                    setPhone(e.target.value);
+                                    validatePhone(e.target.value);
                                 }}
                                 className={`w-full border rounded-md p-3 focus:outline-none focus:ring-2 text-gray-900 placeholder-gray-400 ${
-                                    errors.email
+                                    errors.phone
                                         ? "border-red-500 focus:ring-red-500"
                                         : "border-gray-300 focus:ring-blue-500"
                                 }`}
                             />
-                            {errors.email && (
+                            {errors.phone && (
                                 <p className="text-red-500 text-sm mt-1">
-                                    {errors.email}
+                                    {errors.phone}
                                 </p>
                             )}
                         </div>
@@ -214,12 +221,12 @@ export default function SignInPage({
                             type="submit"
                             disabled={
                                 Object.keys(errors).length > 0 ||
-                                !email ||
+                                !phone ||
                                 !password
                             }
                             className={`w-full py-3 rounded-md transition font-semibold ${
                                 Object.keys(errors).length > 0 ||
-                                !email ||
+                                !phone ||
                                 !password
                                     ? "bg-gray-400 cursor-not-allowed text-white"
                                     : "bg-[#F5A623] text-white hover:bg-[#e49b1a]"

@@ -112,6 +112,7 @@ const DiscoverSection = () => {
                             <div className="relative w-full h-56">
                                 <Image
                                     src="/images/rooms/public-hero.png"
+                                    alt={place.title}
                                     fill
                                     className="object-cover"
                                     sizes="(max-width: 768px) 100vw, 33vw"

@@ -10,11 +10,13 @@ import { useRouter } from "next/navigation";
 interface SignUpPageProps {
     onClose?: () => void;
     onSwitchToSignIn?: () => void;
+    onAuthSuccess?: () => void;
 }
 
 export default function SignUpPage({
     onClose,
     onSwitchToSignIn,
+    onAuthSuccess,
 }: SignUpPageProps) {
     const [formData, setFormData] = useState({
         name: "",
@@ -103,14 +105,18 @@ export default function SignUpPage({
                 }
                 break;
             case "passport":
-                if (value.length < 5) {
-                    newErrors.passport =
-                        "Passport must be at least 5 characters";
-                } else if (value.length > 50) {
-                    newErrors.passport =
-                        "Passport must be less than 50 characters";
+                if (value && value.length > 0) {
+                    if (value.length < 5) {
+                        newErrors.passport =
+                            "Passport must be at least 5 characters";
+                    } else if (value.length > 50) {
+                        newErrors.passport =
+                            "Passport must be less than 50 characters";
+                    } else {
+                        delete newErrors.passport;
+                    }
                 } else {
-                    delete newErrors.passport;
+                    delete newErrors.passport; // Passport is optional
                 }
                 break;
             case "nationality":
@@ -201,25 +207,48 @@ export default function SignUpPage({
     const handleOnSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        // Additional validation before submission
+        const ageValue = parseInt(formData.age);
+        if (isNaN(ageValue) || ageValue < 18 || ageValue > 120) {
+            toast.error("Please enter a valid age between 18 and 120");
+            return;
+        }
+
         // Prepare the data payload
         const userData = {
-            name: formData.name,
-            email: formData.email,
+            name: formData.name.trim(),
+            email: formData.email.trim() || null,
             password: formData.password,
-            phone: formData.phone,
-            address: formData.address,
-            nid: formData.nid,
-            passport: formData.passport || null,
-            nationality: formData.nationality,
-            Profession: formData.profession,
+            phone: formData.phone.trim(),
+            address: formData.address.trim(),
+            nid: formData.nid.trim(),
+            passport: formData.passport.trim() || null,
+            nationality: formData.nationality.trim(),
+            profession: formData.profession.trim(),
             age: parseInt(formData.age),
             maritalStatus: formData.maritalStatus,
-            vehicleNo: formData.vehicleNo || null,
-            fatherName: formData.fatherName,
+            vehicleNo: formData.vehicleNo.trim() || null,
+            fatherName: formData.fatherName.trim(),
             registrationDate: new Date().toISOString(),
         };
 
         console.log("Sending user data:", userData);
+        console.log("Data types:", {
+            name: typeof userData.name,
+            email: typeof userData.email,
+            password: typeof userData.password,
+            phone: typeof userData.phone,
+            address: typeof userData.address,
+            nid: typeof userData.nid,
+            passport: typeof userData.passport,
+            nationality: typeof userData.nationality,
+            profession: typeof userData.profession,
+            age: typeof userData.age,
+            maritalStatus: typeof userData.maritalStatus,
+            vehicleNo: typeof userData.vehicleNo,
+            fatherName: typeof userData.fatherName,
+            registrationDate: typeof userData.registrationDate,
+        });
 
         // Use environment variable or fallback to localhost
         const baseURL =
@@ -263,8 +292,13 @@ export default function SignUpPage({
                     onClose();
                 }
 
+                // Call auth success callback
+                if (onAuthSuccess) {
+                    onAuthSuccess();
+                }
+
                 // Navigate to root
-                router.push('/');
+                router.push("/");
 
                 // Show success message
                 toast.success(
@@ -320,6 +354,19 @@ export default function SignUpPage({
                             err.response.data.details
                         );
                     }
+
+                    // Show the raw error response for debugging
+                    console.log("Raw backend error:", err.response.data);
+                    toast.error(
+                        `Backend Error: ${JSON.stringify(err.response.data)}`
+                    );
+
+                    // Also show a more user-friendly message
+                    setTimeout(() => {
+                        toast.info(
+                            "Check browser console for detailed error information"
+                        );
+                    }, 1000);
                 } else {
                     errorMessage =
                         err.response.data?.message ||
@@ -369,7 +416,6 @@ export default function SignUpPage({
         formData.phone &&
         formData.address &&
         formData.nid &&
-        formData.passport && // Passport is required according to backend
         formData.nationality &&
         formData.profession &&
         formData.age &&
@@ -440,7 +486,7 @@ export default function SignUpPage({
                             <input
                                 type="email"
                                 name="email"
-                                placeholder="your@email.com (optional)"
+                                placeholder="your@email.com "
                                 value={formData.email}
                                 onChange={handleInputChange}
                                 className={`w-full border rounded-md p-3 focus:outline-none focus:ring-2 text-gray-900 placeholder-gray-400 ${
@@ -483,9 +529,7 @@ export default function SignUpPage({
                                     {errors.phone}
                                 </p>
                             )}
-                            <p className="text-xs text-gray-500 mt-1">
-                                Bangladesh phone number (11-20 characters)
-                            </p>
+                            <p className="text-xs text-gray-500 mt-1"></p>
                         </div>
 
                         <div>
@@ -528,7 +572,7 @@ export default function SignUpPage({
                         <input
                             type="text"
                             name="address"
-                            placeholder="Your full address (min 5 characters)"
+                            placeholder="Your full address "
                             required
                             value={formData.address}
                             onChange={handleInputChange}
@@ -556,7 +600,7 @@ export default function SignUpPage({
                             <input
                                 type="text"
                                 name="nid"
-                                placeholder="National ID Number (min 5 characters)"
+                                placeholder="National ID Number "
                                 required
                                 value={formData.nid}
                                 onChange={handleInputChange}
@@ -578,13 +622,12 @@ export default function SignUpPage({
                                 htmlFor="passport"
                                 className="block font-medium text-gray-800 mb-2"
                             >
-                                Passport *
+                                Passport
                             </label>
                             <input
                                 type="text"
                                 name="passport"
-                                placeholder="Passport Number (min 5 characters)"
-                                required
+                                placeholder="Passport Number "
                                 value={formData.passport}
                                 onChange={handleInputChange}
                                 className={`w-full border rounded-md p-3 focus:outline-none focus:ring-2 text-gray-900 placeholder-gray-400 ${
@@ -612,7 +655,7 @@ export default function SignUpPage({
                             <input
                                 type="text"
                                 name="nationality"
-                                placeholder="e.g. Bangladeshi (min 5 characters)"
+                                placeholder="e.g. Bangladeshi"
                                 required
                                 value={formData.nationality}
                                 onChange={handleInputChange}
@@ -639,7 +682,7 @@ export default function SignUpPage({
                             <input
                                 type="text"
                                 name="profession"
-                                placeholder="e.g. Teacher (min 5 characters)"
+                                placeholder="e.g. Teacher"
                                 required
                                 value={formData.profession}
                                 onChange={handleInputChange}
@@ -667,7 +710,7 @@ export default function SignUpPage({
                         <input
                             type="text"
                             name="fatherName"
-                            placeholder="Father's full name (min 5 characters)"
+                            placeholder="Father's full name"
                             required
                             value={formData.fatherName}
                             onChange={handleInputChange}
@@ -695,7 +738,7 @@ export default function SignUpPage({
                             <input
                                 type="text"
                                 name="vehicleNo"
-                                placeholder="Vehicle registration number (optional)"
+                                placeholder="Vehicle registration number"
                                 value={formData.vehicleNo}
                                 onChange={handleInputChange}
                                 className={`w-full border rounded-md p-3 focus:outline-none focus:ring-2 text-gray-900 placeholder-gray-400 ${
@@ -735,15 +778,28 @@ export default function SignUpPage({
                         >
                             Password *
                         </label>
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="Enter your password"
-                            required
-                            value={formData.password}
-                            onChange={handleInputChange}
-                            className="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2 text-gray-900 placeholder-gray-400"
-                        />
+                        <div className="relative">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                placeholder="Enter your password"
+                                required
+                                value={formData.password}
+                                onChange={handleInputChange}
+                                className="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2 text-gray-900 placeholder-gray-400 pr-10"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+                            >
+                                {showPassword ? (
+                                    <EyeOff className="w-5 h-5" />
+                                ) : (
+                                    <Eye className="w-5 h-5" />
+                                )}
+                            </button>
+                        </div>
                         <ul className="text-sm mt-2 ml-1 space-y-1">
                             {passwordValidations.map((rule, idx) => (
                                 <li
