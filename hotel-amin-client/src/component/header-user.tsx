@@ -4,11 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
-import { FaShoppingCart, FaBars, FaTimes } from "react-icons/fa";
+import { FaShoppingCart, FaBars, FaTimes, FaChevronDown } from "react-icons/fa";
 import { IoGlobeOutline } from "react-icons/io5";
 import SignInPage from "@/app/(user)/auth/SignInPage";
 import SignUpPage from "@/app/(user)/auth/SignUpPage";
 import { decodeJWT, singOut, getToken } from "@/app/utilities/jwt-operation";
+import { getCartItemCount } from "@/app/utilities/cart-utils";
 import { toast } from "react-toastify";
 
 const navLinks = [
@@ -20,12 +21,20 @@ const navLinks = [
     { name: "Contact Us", href: "/contact" },
 ];
 
+const serviceLinks = [
+    { name: "Complain", href: "/complain" },
+    { name: "Housekeeping", href: "/housekeeping" },
+];
+
 const HeaderUser = () => {
     const [signinButton, setSignInButton] = useState(false);
     const [signupButton, setSignUpButton] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user, setUser] = useState<any>(null);
+    const [cartItemCount, setCartItemCount] = useState(0);
+    const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
     const modalRef = useRef<HTMLDivElement>(null);
+    const servicesDropdownRef = useRef<HTMLDivElement>(null);
 
     // Check authentication status
     const checkAuthStatus = () => {
@@ -43,6 +52,12 @@ const HeaderUser = () => {
             setIsAuthenticated(false);
             setUser(null);
         }
+    };
+
+    // Update cart item count
+    const updateCartCount = () => {
+        const count = getCartItemCount();
+        setCartItemCount(count);
     };
 
     // Handle logout
@@ -67,6 +82,22 @@ const HeaderUser = () => {
     // Check auth status on component mount
     useEffect(() => {
         checkAuthStatus();
+        updateCartCount();
+
+        // Listen for storage changes to update cart count
+        const handleStorageChange = () => {
+            updateCartCount();
+        };
+
+        window.addEventListener("storage", handleStorageChange);
+
+        // Also listen for custom cart update events
+        window.addEventListener("cartUpdated", handleStorageChange);
+
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+            window.removeEventListener("cartUpdated", handleStorageChange);
+        };
     }, []);
 
     const handleSignInButton = (value: boolean) => {
@@ -91,16 +122,24 @@ const HeaderUser = () => {
                 setSignInButton(false);
                 setSignUpButton(false);
             }
+
+            // Close services dropdown when clicking outside
+            if (
+                servicesDropdownRef.current &&
+                !servicesDropdownRef.current.contains(event.target as Node)
+            ) {
+                setServicesDropdownOpen(false);
+            }
         };
 
-        if (signinButton || signupButton) {
+        if (signinButton || signupButton || servicesDropdownOpen) {
             document.addEventListener("mousedown", handleClickOutside);
         }
 
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [signinButton, signupButton]);
+    }, [signinButton, signupButton, servicesDropdownOpen]);
 
     const pathname = usePathname();
     const [menuOpen, setMenuOpen] = useState(false);
@@ -137,6 +176,15 @@ const HeaderUser = () => {
 
                     {/* Mobile Right Section */}
                     <div className="md:hidden flex items-center gap-3">
+                        {/* Mobile Cart Icon */}
+                        <Link href="/cart" className="relative">
+                            <FaShoppingCart className="text-white text-lg cursor-pointer hover:text-yellow-400 transition" />
+                            {cartItemCount > 0 && (
+                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                    {cartItemCount > 99 ? "99+" : cartItemCount}
+                                </span>
+                            )}
+                        </Link>
                         {isAuthenticated ? (
                             <button
                                 onClick={handleLogout}
@@ -155,11 +203,12 @@ const HeaderUser = () => {
                                     Sign In
                                 </button>
 
+                                {/* Hidden Sign Up button - keeping functionality */}
                                 <button
                                     onClick={() =>
                                         handleSignUpButton(!signupButton)
                                     }
-                                    className="bg-blue-600 text-white text-sm font-semibold px-4 py-1 rounded hover:bg-blue-700 transition"
+                                    className="hidden"
                                 >
                                     Sign Up
                                 </button>
@@ -200,7 +249,17 @@ const HeaderUser = () => {
 
                         {/* Desktop buttons */}
                         <div className="hidden md:flex flex-wrap gap-2 sm:gap-3 items-center justify-center md:justify-end w-full md:w-auto">
-                            <FaShoppingCart className="text-white text-lg cursor-pointer" />
+                            {/* Cart Icon with Badge */}
+                            <Link href="/cart" className="relative">
+                                <FaShoppingCart className="text-white text-lg cursor-pointer hover:text-yellow-400 transition" />
+                                {cartItemCount > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                        {cartItemCount > 99
+                                            ? "99+"
+                                            : cartItemCount}
+                                    </span>
+                                )}
+                            </Link>
 
                             {isAuthenticated ? (
                                 <button
@@ -220,11 +279,12 @@ const HeaderUser = () => {
                                         Sign In
                                     </button>
 
+                                    {/* Hidden Sign Up button - keeping functionality */}
                                     <button
                                         onClick={() =>
                                             handleSignUpButton(!signupButton)
                                         }
-                                        className="bg-blue-600 text-white text-sm font-semibold px-4 py-1 rounded hover:bg-blue-700 transition"
+                                        className="hidden"
                                     >
                                         Sign Up
                                     </button>
@@ -279,19 +339,79 @@ const HeaderUser = () => {
 
                     {/* Nav Row - Desktop */}
                     <nav className="hidden md:flex flex-wrap justify-start gap-4 md:gap-15 px-4 sm:px-6 pb-4 pt-2 text-sm font-medium">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                className={`cursor-pointer ${
-                                    pathname === link.href
+                        {navLinks
+                            .filter((link) => link.name !== "Contact Us")
+                            .map((link) => (
+                                <Link
+                                    key={link.href}
+                                    href={link.href}
+                                    className={`cursor-pointer ${
+                                        pathname === link.href
+                                            ? "text-white font-bold underline"
+                                            : "text-white hover:underline"
+                                    }`}
+                                >
+                                    {link.name}
+                                </Link>
+                            ))}
+
+                        {/* Services Dropdown */}
+                        <div ref={servicesDropdownRef} className="relative">
+                            <button
+                                onClick={() =>
+                                    setServicesDropdownOpen(
+                                        !servicesDropdownOpen
+                                    )
+                                }
+                                className={`cursor-pointer flex items-center gap-1 ${
+                                    serviceLinks.some(
+                                        (link) => pathname === link.href
+                                    )
                                         ? "text-white font-bold underline"
                                         : "text-white hover:underline"
                                 }`}
                             >
-                                {link.name}
-                            </Link>
-                        ))}
+                                Self Service
+                                <FaChevronDown
+                                    className={`text-xs transition-transform ${
+                                        servicesDropdownOpen ? "rotate-180" : ""
+                                    }`}
+                                />
+                            </button>
+
+                            {servicesDropdownOpen && (
+                                <div className="absolute top-full left-0 mt-2 bg-white rounded-md shadow-lg border min-w-[150px] z-50">
+                                    {serviceLinks.map((link) => (
+                                        <Link
+                                            key={link.href}
+                                            href={link.href}
+                                            onClick={() =>
+                                                setServicesDropdownOpen(false)
+                                            }
+                                            className={`block px-4 py-2 text-sm hover:bg-gray-100 ${
+                                                pathname === link.href
+                                                    ? "text-blue-600 font-bold bg-blue-50"
+                                                    : "text-gray-700"
+                                            }`}
+                                        >
+                                            {link.name}
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Contact Us at the end */}
+                        <Link
+                            href="/contact"
+                            className={`cursor-pointer ${
+                                pathname === "/contact"
+                                    ? "text-white font-bold underline"
+                                    : "text-white hover:underline"
+                            }`}
+                        >
+                            Contact Us
+                        </Link>
                     </nav>
 
                     {/* Mobile Menu */}
@@ -301,7 +421,25 @@ const HeaderUser = () => {
                             className="flex flex-col items-center md:hidden gap-4 px-4 pb-4 pt-2 text-sm font-medium border-t border-gray-600"
                         >
                             {/* Nav Links */}
-                            {navLinks.map((link) => (
+                            {navLinks
+                                .filter((link) => link.name !== "Contact Us")
+                                .map((link) => (
+                                    <Link
+                                        key={link.href}
+                                        href={link.href}
+                                        onClick={() => setMenuOpen(false)} // Close menu on link click
+                                        className={`cursor-pointer ${
+                                            pathname === link.href
+                                                ? "text-white font-bold underline"
+                                                : "text-white hover:underline"
+                                        }`}
+                                    >
+                                        {link.name}
+                                    </Link>
+                                ))}
+
+                            {/* Services Links in Mobile */}
+                            {serviceLinks.map((link) => (
                                 <Link
                                     key={link.href}
                                     href={link.href}
@@ -315,6 +453,19 @@ const HeaderUser = () => {
                                     {link.name}
                                 </Link>
                             ))}
+
+                            {/* Contact Us at the end */}
+                            <Link
+                                href="/contact"
+                                onClick={() => setMenuOpen(false)}
+                                className={`cursor-pointer ${
+                                    pathname === "/contact"
+                                        ? "text-white font-bold underline"
+                                        : "text-white hover:underline"
+                                }`}
+                            >
+                                Contact Us
+                            </Link>
 
                             {/* Cart */}
                             <FaShoppingCart className="text-white text-lg cursor-pointer" />

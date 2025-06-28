@@ -32,6 +32,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PdfModule } from './pdf/pdf.module';
 import { AccommodationModule } from './accommodation/accommodation.module';
 import { DiscoverModule } from './discover/discover.module';
+import { ComplainModule } from './complain/complain.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { DiscoverModule } from './discover/discover.module';
     PdfModule,
     AccommodationModule,
     DiscoverModule,
+    ComplainModule,
   ],
   controllers: [AppController],
   providers: [
