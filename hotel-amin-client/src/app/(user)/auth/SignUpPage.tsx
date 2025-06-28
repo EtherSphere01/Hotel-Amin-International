@@ -70,19 +70,24 @@ export default function SignUpPage({
                 }
                 break;
             case "phone":
-                // Bangladesh phone number validation: should be 11-20 chars and valid BD format
-                const bdPhoneRegex = /^(\+880|880|0)?1[3-9]\d{8}$/;
+                // Bangladesh phone number validation: should be 11 digits for local format
                 if (value.length < 11) {
                     newErrors.phone =
                         "Phone number must be at least 11 characters";
                 } else if (value.length > 20) {
                     newErrors.phone =
                         "Phone number must be less than 20 characters";
-                } else if (!bdPhoneRegex.test(value.replace(/\s|-/g, ""))) {
-                    newErrors.phone =
-                        "Please enter a valid Bangladesh phone number (e.g., +8801XXXXXXXXX)";
                 } else {
-                    delete newErrors.phone;
+                    // Accept various BD formats: 01XXXXXXXXX, +8801XXXXXXXXX, 8801XXXXXXXXX
+                    const cleanPhone = value.replace(/\s|-/g, "");
+                    // More flexible regex that accepts different formats
+                    const bdPhoneRegex = /^(\+?880|0)?1[0-9]\d{8}$/;
+                    if (!bdPhoneRegex.test(cleanPhone)) {
+                        newErrors.phone =
+                            "Please enter a valid phone number (e.g., 01XXXXXXXXX or +8801XXXXXXXXX)";
+                    } else {
+                        delete newErrors.phone;
+                    }
                 }
                 break;
             case "address":
@@ -215,22 +220,27 @@ export default function SignUpPage({
         }
 
         // Prepare the data payload
-        const userData = {
+        const userData: any = {
             name: formData.name.trim(),
-            email: formData.email.trim() || null,
             password: formData.password,
             phone: formData.phone.trim(),
             address: formData.address.trim(),
             nid: formData.nid.trim(),
-            passport: formData.passport.trim() || null,
             nationality: formData.nationality.trim(),
             profession: formData.profession.trim(),
             age: parseInt(formData.age),
             maritalStatus: formData.maritalStatus,
-            vehicleNo: formData.vehicleNo.trim() || null,
             fatherName: formData.fatherName.trim(),
-            registrationDate: new Date().toISOString(),
         };
+
+        // Only include optional fields if they have valid values
+        if (formData.email.trim()) {
+            userData.email = formData.email.trim();
+        }
+
+        // Include passport and vehicleNo with default values if empty (database constraint)
+        userData.passport = formData.passport.trim() || "Not Available";
+        userData.vehicleNo = formData.vehicleNo.trim() || "Not Available";
 
         console.log("Sending user data:", userData);
         console.log("Data types:", {
@@ -247,7 +257,6 @@ export default function SignUpPage({
             maritalStatus: typeof userData.maritalStatus,
             vehicleNo: typeof userData.vehicleNo,
             fatherName: typeof userData.fatherName,
-            registrationDate: typeof userData.registrationDate,
         });
 
         // Use environment variable or fallback to localhost
@@ -256,6 +265,7 @@ export default function SignUpPage({
         const endpoint = `${baseURL}/user/createUser`;
 
         console.log("API Endpoint:", endpoint);
+        console.log("Sending user data:", userData);
 
         try {
             const response = await axios.post(endpoint, userData, {
@@ -265,8 +275,16 @@ export default function SignUpPage({
             });
 
             console.log("API Response:", response.data);
+            console.log("API Status:", response.status);
 
             if (response.status === 201 || response.status === 200) {
+                console.log("Signup successful, calling callbacks...");
+
+                // Show success message first
+                toast.success(
+                    "Account created successfully! Welcome email has been sent."
+                );
+
                 // Reset form on success
                 setFormData({
                     name: "",
@@ -287,24 +305,28 @@ export default function SignUpPage({
                 // Clear any existing errors
                 setErrors({});
 
+                // Call auth success callback if provided (this should hide signup/signin buttons)
+                if (onAuthSuccess) {
+                    console.log("Calling onAuthSuccess callback");
+                    setTimeout(() => onAuthSuccess(), 500);
+                }
+
                 // Close modal if onClose prop is provided
                 if (onClose) {
-                    onClose();
+                    console.log("Calling onClose callback");
+                    setTimeout(() => onClose(), 1000);
                 }
 
-                // Call auth success callback
-                if (onAuthSuccess) {
-                    onAuthSuccess();
-                }
-
-                // Navigate to root
-                router.push("/");
-
-                // Show success message
-                toast.success(
-                    "Account created successfully! You can now sign in."
-                );
+                // Navigate to signin page or home after a delay
+                setTimeout(() => {
+                    if (onSwitchToSignIn) {
+                        onSwitchToSignIn();
+                    } else {
+                        router.push("/");
+                    }
+                }, 1500);
             } else {
+                console.log("Unexpected response status:", response.status);
                 toast.error(response.data?.message || "Sign up failed");
             }
         } catch (err: any) {
@@ -336,37 +358,25 @@ export default function SignUpPage({
                             const validationErrors =
                                 err.response.data.message.join(", ");
                             errorMessage = `Validation Error: ${validationErrors}`;
+                        } else if (
+                            err.response.data.message.includes(
+                                "User already exists"
+                            )
+                        ) {
+                            errorMessage =
+                                "An account with this email or phone already exists";
                         } else {
-                            errorMessage = `Validation Error: ${err.response.data.message}`;
+                            errorMessage = err.response.data.message;
                         }
                     } else if (err.response.data?.error) {
-                        errorMessage = `Error: ${err.response.data.error}`;
+                        errorMessage = err.response.data.error;
                     } else {
                         errorMessage =
                             "Invalid data format - please check all fields";
                     }
-
-                    // Log the data that was sent vs what was expected
-                    console.log("Data sent to server:", userData);
-                    if (err.response.data?.details) {
-                        console.log(
-                            "Server validation details:",
-                            err.response.data.details
-                        );
-                    }
-
-                    // Show the raw error response for debugging
-                    console.log("Raw backend error:", err.response.data);
-                    toast.error(
-                        `Backend Error: ${JSON.stringify(err.response.data)}`
-                    );
-
-                    // Also show a more user-friendly message
-                    setTimeout(() => {
-                        toast.info(
-                            "Check browser console for detailed error information"
-                        );
-                    }, 1000);
+                } else if (err.response.status === 409) {
+                    errorMessage =
+                        "An account with this email or phone already exists";
                 } else {
                     errorMessage =
                         err.response.data?.message ||
@@ -514,7 +524,7 @@ export default function SignUpPage({
                             <input
                                 type="tel"
                                 name="phone"
-                                placeholder="+8801XXXXXXXXX"
+                                placeholder="01XXXXXXXXX or +8801XXXXXXXXX"
                                 required
                                 value={formData.phone}
                                 onChange={handleInputChange}

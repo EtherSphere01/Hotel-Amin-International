@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
-import { FaShoppingCart, FaBars, FaTimes } from "react-icons/fa";
+import { FaShoppingCart, FaBars, FaTimes, FaChevronDown } from "react-icons/fa";
 import { IoGlobeOutline } from "react-icons/io5";
 import SignInPage from "@/app/(user)/auth/SignInPage";
 import SignUpPage from "@/app/(user)/auth/SignUpPage";
@@ -19,7 +19,11 @@ const navLinks = [
     { name: "Offers", href: "/offers" },
     { name: "Gallery", href: "/gallery" },
     { name: "Contact Us", href: "/contact" },
-    { name: "Cart", href: "/cart" },
+];
+
+const serviceLinks = [
+    { name: "Complain", href: "/complain" },
+    { name: "Housekeeping", href: "/housekeeping" },
 ];
 
 const HeaderUser = () => {
@@ -28,7 +32,9 @@ const HeaderUser = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user, setUser] = useState<any>(null);
     const [cartItemCount, setCartItemCount] = useState(0);
+    const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
     const modalRef = useRef<HTMLDivElement>(null);
+    const servicesDropdownRef = useRef<HTMLDivElement>(null);
 
     // Check authentication status
     const checkAuthStatus = () => {
@@ -116,16 +122,24 @@ const HeaderUser = () => {
                 setSignInButton(false);
                 setSignUpButton(false);
             }
+
+            // Close services dropdown when clicking outside
+            if (
+                servicesDropdownRef.current &&
+                !servicesDropdownRef.current.contains(event.target as Node)
+            ) {
+                setServicesDropdownOpen(false);
+            }
         };
 
-        if (signinButton || signupButton) {
+        if (signinButton || signupButton || servicesDropdownOpen) {
             document.addEventListener("mousedown", handleClickOutside);
         }
 
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [signinButton, signupButton]);
+    }, [signinButton, signupButton, servicesDropdownOpen]);
 
     const pathname = usePathname();
     const [menuOpen, setMenuOpen] = useState(false);
@@ -189,11 +203,12 @@ const HeaderUser = () => {
                                     Sign In
                                 </button>
 
+                                {/* Hidden Sign Up button - keeping functionality */}
                                 <button
                                     onClick={() =>
                                         handleSignUpButton(!signupButton)
                                     }
-                                    className="bg-blue-600 text-white text-sm font-semibold px-4 py-1 rounded hover:bg-blue-700 transition"
+                                    className="hidden"
                                 >
                                     Sign Up
                                 </button>
@@ -264,11 +279,12 @@ const HeaderUser = () => {
                                         Sign In
                                     </button>
 
+                                    {/* Hidden Sign Up button - keeping functionality */}
                                     <button
                                         onClick={() =>
                                             handleSignUpButton(!signupButton)
                                         }
-                                        className="bg-blue-600 text-white text-sm font-semibold px-4 py-1 rounded hover:bg-blue-700 transition"
+                                        className="hidden"
                                     >
                                         Sign Up
                                     </button>
@@ -323,19 +339,79 @@ const HeaderUser = () => {
 
                     {/* Nav Row - Desktop */}
                     <nav className="hidden md:flex flex-wrap justify-start gap-4 md:gap-15 px-4 sm:px-6 pb-4 pt-2 text-sm font-medium">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                className={`cursor-pointer ${
-                                    pathname === link.href
+                        {navLinks
+                            .filter((link) => link.name !== "Contact Us")
+                            .map((link) => (
+                                <Link
+                                    key={link.href}
+                                    href={link.href}
+                                    className={`cursor-pointer ${
+                                        pathname === link.href
+                                            ? "text-white font-bold underline"
+                                            : "text-white hover:underline"
+                                    }`}
+                                >
+                                    {link.name}
+                                </Link>
+                            ))}
+
+                        {/* Services Dropdown */}
+                        <div ref={servicesDropdownRef} className="relative">
+                            <button
+                                onClick={() =>
+                                    setServicesDropdownOpen(
+                                        !servicesDropdownOpen
+                                    )
+                                }
+                                className={`cursor-pointer flex items-center gap-1 ${
+                                    serviceLinks.some(
+                                        (link) => pathname === link.href
+                                    )
                                         ? "text-white font-bold underline"
                                         : "text-white hover:underline"
                                 }`}
                             >
-                                {link.name}
-                            </Link>
-                        ))}
+                                Self Service
+                                <FaChevronDown
+                                    className={`text-xs transition-transform ${
+                                        servicesDropdownOpen ? "rotate-180" : ""
+                                    }`}
+                                />
+                            </button>
+
+                            {servicesDropdownOpen && (
+                                <div className="absolute top-full left-0 mt-2 bg-white rounded-md shadow-lg border min-w-[150px] z-50">
+                                    {serviceLinks.map((link) => (
+                                        <Link
+                                            key={link.href}
+                                            href={link.href}
+                                            onClick={() =>
+                                                setServicesDropdownOpen(false)
+                                            }
+                                            className={`block px-4 py-2 text-sm hover:bg-gray-100 ${
+                                                pathname === link.href
+                                                    ? "text-blue-600 font-bold bg-blue-50"
+                                                    : "text-gray-700"
+                                            }`}
+                                        >
+                                            {link.name}
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Contact Us at the end */}
+                        <Link
+                            href="/contact"
+                            className={`cursor-pointer ${
+                                pathname === "/contact"
+                                    ? "text-white font-bold underline"
+                                    : "text-white hover:underline"
+                            }`}
+                        >
+                            Contact Us
+                        </Link>
                     </nav>
 
                     {/* Mobile Menu */}
@@ -345,7 +421,25 @@ const HeaderUser = () => {
                             className="flex flex-col items-center md:hidden gap-4 px-4 pb-4 pt-2 text-sm font-medium border-t border-gray-600"
                         >
                             {/* Nav Links */}
-                            {navLinks.map((link) => (
+                            {navLinks
+                                .filter((link) => link.name !== "Contact Us")
+                                .map((link) => (
+                                    <Link
+                                        key={link.href}
+                                        href={link.href}
+                                        onClick={() => setMenuOpen(false)} // Close menu on link click
+                                        className={`cursor-pointer ${
+                                            pathname === link.href
+                                                ? "text-white font-bold underline"
+                                                : "text-white hover:underline"
+                                        }`}
+                                    >
+                                        {link.name}
+                                    </Link>
+                                ))}
+
+                            {/* Services Links in Mobile */}
+                            {serviceLinks.map((link) => (
                                 <Link
                                     key={link.href}
                                     href={link.href}
@@ -359,6 +453,19 @@ const HeaderUser = () => {
                                     {link.name}
                                 </Link>
                             ))}
+
+                            {/* Contact Us at the end */}
+                            <Link
+                                href="/contact"
+                                onClick={() => setMenuOpen(false)}
+                                className={`cursor-pointer ${
+                                    pathname === "/contact"
+                                        ? "text-white font-bold underline"
+                                        : "text-white hover:underline"
+                                }`}
+                            >
+                                Contact Us
+                            </Link>
 
                             {/* Cart */}
                             <FaShoppingCart className="text-white text-lg cursor-pointer" />

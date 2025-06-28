@@ -17,6 +17,7 @@ import { PaginationProvider } from 'src/common/pagination/providers/pagination.p
 import { Reservation } from 'src/reservation/entities/reservation.entity';
 import { Booking } from 'src/booking/entities/booking.entity';
 import { EmailService } from 'src/email/email.service'; // Add this import
+import { Accommodation } from 'src/accommodation/accommodation.entity';
 import { join } from 'path';
 import { readFileSync } from 'fs';
 import * as ejs from 'ejs';
@@ -30,6 +31,8 @@ export class RoomService {
     private readonly roomItemRepository: Repository<RoomItem>,
     @InjectRepository(Employee)
     private employeeRepository: Repository<Employee>,
+    @InjectRepository(Accommodation)
+    private readonly accommodationRepository: Repository<Accommodation>,
     private readonly paginationProvider: PaginationProvider,
     @Inject(EmailService)
     private readonly emailService: EmailService,
@@ -113,13 +116,16 @@ export class RoomService {
 
     const EMAIL_USER = process.env.EMAIL_USER || 'universuswebtech@gmail.com';
 
-    await this.sendIssueReportEmail(
+    // Send email asynchronously without blocking the response
+    this.sendIssueReportEmail(
       EMAIL_USER,
       room_num,
       item_name,
       reportItemIssueDto.issue_report,
       reportItemIssueDto.status,
-    );
+    ).catch((error) => {
+      console.error('Failed to send issue report email:', error);
+    });
 
     return savedItem;
   }
@@ -229,7 +235,25 @@ export class RoomService {
     return rooms;
   }
 
-  private async sendIssueReportEmail(
+  public async getRoomItems(roomNum: number) {
+    const room = await this.roomRepository.findOne({
+      where: { room_num: roomNum },
+      relations: ['roomItems'],
+    });
+
+    if (!room) {
+      throw new NotFoundException(`Room ${roomNum} not found.`);
+    }
+
+    return room.roomItems.map((item) => ({
+      id: item.item_id,
+      item_name: item.item_name,
+      room_num: room.room_num,
+      status: item.status,
+    }));
+  }
+
+  public async sendIssueReportEmail(
     email: string,
     roomNumber: number,
     itemName: string,
@@ -237,50 +261,104 @@ export class RoomService {
     status: string,
   ) {
     try {
-      const possiblePaths = [
-        join(process.cwd(), 'src', 'email', 'templates', 'issue-report.ejs'),
-        join(process.cwd(), 'dist', 'email', 'templates', 'issue-report.ejs'),
-        join(__dirname, '..', '..', 'email', 'templates', 'issue-report.ejs'),
-      ];
-
-      let template;
-      for (const path of possiblePaths) {
-        try {
-          template = readFileSync(path, 'utf8');
-          break;
-        } catch (e) {
-          continue;
-        }
-      }
-
-      if (!template) {
-        throw new Error('Issue report template not found');
-      }
-
-      const html = ejs.render(template, {
-        roomNumber,
-        itemName,
-        issueDescription,
-        status,
-      });
-
-      await this.emailService.sendEmail({
+      // Set a timeout for email sending to prevent hanging
+      const emailPromise = this.emailService.sendEmail({
         recipients: [email],
         subject: `Issue Reported for Room ${roomNumber} - ${itemName}`,
-        html: html,
-      });
-    } catch (error) {
-      console.error('Error sending issue report email:', error);
-      // Fallback to simple text email
-      await this.emailService.sendEmail({
-        recipients: [email],
-        subject: `Issue Reported for Room ${roomNumber}`,
         html: `
-                <p><strong>Item:</strong> ${itemName}</p>
-                <p><strong>Issue:</strong> ${issueDescription}</p>
-                <p><strong>Status:</strong> ${status}</p>
-            `,
+          <h2>Issue Report</h2>
+          <p><strong>Room Number:</strong> ${roomNumber}</p>
+          <p><strong>Item:</strong> ${itemName}</p>
+          <p><strong>Issue:</strong> ${issueDescription}</p>
+          <p><strong>Status:</strong> ${status}</p>
+          <p><strong>Reported At:</strong> ${new Date().toLocaleString()}</p>
+        `,
       });
+
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Email timeout')), 5000),
+      );
+
+      await Promise.race([emailPromise, timeoutPromise]);
+      console.log('Issue report email sent successfully');
+    } catch (error) {
+      console.error('Error sending issue report email:', error.message);
+      // Don't throw error to prevent API from failing
+      // Just log it and continue
+    }
+  }
+
+  public async searchAvailableRooms(
+    checkIn: string,
+    checkOut: string,
+    guests?: number,
+  ) {
+    try {
+      const checkInDate = new Date(checkIn);
+      const checkOutDate = new Date(checkOut);
+
+      console.log('Searching for available rooms:', {
+        checkIn: checkInDate,
+        checkOut: checkOutDate,
+        guests,
+      });
+
+      // Validate dates
+      if (checkInDate >= checkOutDate) {
+        throw new NotFoundException(
+          'Check-out date must be after check-in date',
+        );
+      }
+
+      if (checkInDate < new Date()) {
+        throw new NotFoundException('Check-in date cannot be in the past');
+      }
+
+      // For now, let's use accommodations as available "rooms"
+      // In a real system, you'd have actual room inventory linked to accommodations
+      const accommodations = await this.accommodationRepository.find();
+
+      console.log(`Found ${accommodations.length} accommodations`);
+
+      // Transform accommodations to look like available rooms
+      const availableRooms = accommodations.map((acc, index) => ({
+        room_num: 100 + acc.id, // Generate room numbers based on accommodation ID
+        room_type: acc.title,
+        price_per_night: parseFloat(acc.price.toString()),
+        room_status: 'available',
+        housekeeping_status: 'clean',
+        capacity: parseInt(acc.max_adults.split(' ')[0]) || 2,
+        description: acc.description,
+        accommodation_id: acc.id,
+        category: acc.category,
+        specs: acc.specs,
+      }));
+
+      // Filter by guest capacity if specified
+      let filteredRooms = availableRooms;
+      if (guests && guests > 0) {
+        filteredRooms = availableRooms.filter(
+          (room) => room.capacity >= guests,
+        );
+      }
+
+      console.log(
+        `Found ${filteredRooms.length} available rooms matching criteria`,
+      );
+
+      return {
+        success: true,
+        data: filteredRooms,
+        searchCriteria: {
+          checkIn: checkInDate,
+          checkOut: checkOutDate,
+          guests: guests || 1,
+        },
+      };
+    } catch (error) {
+      console.error('Error searching for available rooms:', error.message);
+      throw error;
     }
   }
 }

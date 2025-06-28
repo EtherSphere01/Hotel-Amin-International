@@ -14,6 +14,7 @@ import {
 } from "@/app/utilities/cart-utils";
 import GuestRegistrationForm from "@/component/GuestRegistrationForm";
 import { decodeJWT } from "@/app/utilities/jwt-operation";
+import { generateBookingPDFFromResponse } from "@/app/utilities/pdf-generator";
 import axios from "axios";
 
 export default function CartPage() {
@@ -211,9 +212,38 @@ export default function CartPage() {
                     `Booking created for ${item.title}:`,
                     response.data
                 );
+
+                // Generate PDF for each booking
+                try {
+                    const roomData = {
+                        id: item.id,
+                        title: item.title,
+                        price: item.price,
+                    };
+
+                    generateBookingPDFFromResponse(
+                        response,
+                        {
+                            checkInDate: item.checkInDate!,
+                            checkOutDate: item.checkOutDate!,
+                            guests: item.guests || 1,
+                            rooms: item.quantity,
+                            appliedCoupon: null,
+                        },
+                        roomData,
+                        guestData
+                    );
+                } catch (pdfError) {
+                    console.error(
+                        `Error generating PDF for ${item.title}:`,
+                        pdfError
+                    );
+                    // Don't break the loop, just log the error
+                }
             }
 
             toast.success("All bookings created successfully!");
+            toast.success("Booking confirmation PDFs have been downloaded!");
             setShowGuestForm(false);
             clearCart(); // Clear cart after successful booking
             // router.push("/booking-confirmation"); // Redirect to confirmation page

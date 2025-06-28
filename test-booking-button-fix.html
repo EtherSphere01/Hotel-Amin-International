@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Search Results Booking Test</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f5f5f5;
+            }
+            .test-section {
+                background: white;
+                padding: 20px;
+                margin: 20px 0;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .status-pass {
+                color: #28a745;
+            }
+            .status-pending {
+                color: #ffc107;
+            }
+            .feature {
+                margin: 10px 0;
+                padding: 10px;
+                border-left: 4px solid #007bff;
+                background-color: #f8f9fa;
+            }
+            .improvement {
+                margin: 10px 0;
+                padding: 10px;
+                border-left: 4px solid #28a745;
+                background-color: #d4edda;
+            }
+            .comparison {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                margin: 20px 0;
+            }
+            .before,
+            .after {
+                padding: 15px;
+                border-radius: 8px;
+            }
+            .before {
+                background-color: #f8d7da;
+                border: 1px solid #f5c6cb;
+            }
+            .after {
+                background-color: #d4edda;
+                border: 1px solid #c3e6cb;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>🏨 Search Results Booking Button Fix</h1>
+
+        <div class="test-section">
+            <h2>🎯 Problem Fixed</h2>
+            <p>
+                The booking button in search results now works exactly like the
+                accommodation details page booking button.
+            </p>
+
+            <div class="comparison">
+                <div class="before">
+                    <h3>❌ Before (Not Working)</h3>
+                    <ul>
+                        <li>Simple navigation to booking page</li>
+                        <li>No guest registration form</li>
+                        <li>No booking creation functionality</li>
+                        <li>Inconsistent with accommodation details</li>
+                    </ul>
+                </div>
+                <div class="after">
+                    <h3>✅ After (Working Like Accommodation Details)</h3>
+                    <ul>
+                        <li>Shows guest registration form</li>
+                        <li>Creates actual booking in database</li>
+                        <li>Same functionality as accommodation details</li>
+                        <li>Consistent user experience</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 Technical Changes Made</h2>
+
+            <div class="improvement">
+                <h3>1. Updated Search Results Page</h3>
+                <p>
+                    <strong>File:</strong>
+                    <code>src/app/(user)/search-results/page.tsx</code>
+                </p>
+                <ul>
+                    <li>Added imports for booking functionality</li>
+                    <li>Added authentication state management</li>
+                    <li>Added guest registration form modal</li>
+                    <li>Updated booking button handler</li>
+                    <li>Added guest booking creation logic</li>
+                </ul>
+            </div>
+
+            <div class="improvement">
+                <h3>2. Enhanced Button Functionality</h3>
+                <ul>
+                    <li>
+                        <strong>Book Now Button:</strong> Now triggers guest
+                        registration form
+                    </li>
+                    <li>
+                        <strong>Icon:</strong> Added calendar icon like
+                        accommodation details
+                    </li>
+                    <li>
+                        <strong>Validation:</strong> Checks booking details
+                        before proceeding
+                    </li>
+                    <li>
+                        <strong>Authentication:</strong> Handles both
+                        authenticated and guest users
+                    </li>
+                </ul>
+            </div>
+
+            <div class="improvement">
+                <h3>3. Booking Flow</h3>
+                <ol>
+                    <li>User clicks "Book Now" button</li>
+                    <li>System validates dates and criteria</li>
+                    <li>Guest registration form appears</li>
+                    <li>User fills in guest details</li>
+                    <li>System creates booking via API</li>
+                    <li>Success message and form closes</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📋 Components Added/Updated</h2>
+
+            <div class="feature">
+                <h3>New Imports</h3>
+                <ul>
+                    <li><code>axios</code> - For API calls</li>
+                    <li><code>FaCalendarAlt</code> - Calendar icon</li>
+                    <li>
+                        <code>GuestRegistrationForm</code> - Booking form
+                        component
+                    </li>
+                    <li><code>decodeJWT</code> - Authentication utility</li>
+                </ul>
+            </div>
+
+            <div class="feature">
+                <h3>New State Variables</h3>
+                <ul>
+                    <li>
+                        <code>showGuestForm</code> - Controls modal visibility
+                    </li>
+                    <li>
+                        <code>selectedRoom</code> - Stores room being booked
+                    </li>
+                    <li>
+                        <code>isAuthenticated</code> - Tracks user auth status
+                    </li>
+                </ul>
+            </div>
+
+            <div class="feature">
+                <h3>New Functions</h3>
+                <ul>
+                    <li>
+                        <code>checkAuthStatus()</code> - Validates user
+                        authentication
+                    </li>
+                    <li>
+                        <code>handleGuestBooking()</code> - Creates booking with
+                        guest data
+                    </li>
+                    <li>
+                        <code>getAuthenticatedUserData()</code> - Pre-fills form
+                        for logged users
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Testing Instructions</h2>
+
+            <div class="feature">
+                <h3>1. Test Booking Flow</h3>
+                <ol>
+                    <li>Go to home page and perform a room search</li>
+                    <li>On search results page, click any "Book Now" button</li>
+                    <li>Verify guest registration form opens</li>
+                    <li>Fill in all required guest details</li>
+                    <li>Submit form and verify booking is created</li>
+                    <li>Check for success message</li>
+                </ol>
+            </div>
+
+            <div class="feature">
+                <h3>2. Test Authentication Integration</h3>
+                <ol>
+                    <li>
+                        Test booking while logged in (form should pre-fill user
+                        data)
+                    </li>
+                    <li>Test booking while not logged in (empty form)</li>
+                    <li>Verify both scenarios work correctly</li>
+                </ol>
+            </div>
+
+            <div class="feature">
+                <h3>3. Test Error Handling</h3>
+                <ol>
+                    <li>Try booking without valid dates</li>
+                    <li>Try submitting incomplete guest form</li>
+                    <li>Verify appropriate error messages appear</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>✨ Key Improvements</h2>
+            <p class="status-pass">
+                <strong>✅ Consistent Functionality:</strong> Search results
+                booking now matches accommodation details exactly
+            </p>
+            <p class="status-pass">
+                <strong>✅ Proper Booking Creation:</strong> Creates actual
+                bookings in database instead of just navigation
+            </p>
+            <p class="status-pass">
+                <strong>✅ Guest Registration:</strong> Full guest form
+                integration with validation
+            </p>
+            <p class="status-pass">
+                <strong>✅ Authentication Support:</strong> Handles both
+                logged-in and guest users
+            </p>
+            <p class="status-pass">
+                <strong>✅ Error Handling:</strong> Comprehensive validation and
+                error messages
+            </p>
+            <p class="status-pass">
+                <strong>✅ User Experience:</strong> Smooth, professional
+                booking flow
+            </p>
+        </div>
+
+        <div class="test-section">
+            <h2>🚀 Ready to Test</h2>
+            <p>
+                The search results booking button now works exactly like the
+                accommodation details booking button. Both use the same:
+            </p>
+            <ul>
+                <li>Guest registration form component</li>
+                <li>Booking creation API</li>
+                <li>Validation logic</li>
+                <li>Error handling</li>
+                <li>Success messaging</li>
+            </ul>
+            <p>
+                <strong
+                    >Start both backend and frontend servers and test the
+                    booking flow!</strong
+                >
+            </p>
+        </div>
+    </body>
+</html>

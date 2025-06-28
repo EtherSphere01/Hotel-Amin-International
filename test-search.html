@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Search Test</title>
+    </head>
+    <body>
+        <h1>Search Functionality Test</h1>
+        <p>Test the search functionality by clicking the button below:</p>
+
+        <button onclick="testSearch()">Test Room Search</button>
+
+        <div id="result"></div>
+
+        <script>
+            async function testSearch() {
+                const searchData = {
+                    checkIn: "2025-07-01",
+                    checkOut: "2025-07-03",
+                    guests: 2,
+                };
+
+                try {
+                    const response = await fetch(
+                        "http://localhost:3000/room/search",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(searchData),
+                        }
+                    );
+
+                    const result = await response.json();
+
+                    document.getElementById("result").innerHTML = `
+                    <h2>Search Results:</h2>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                `;
+
+                    if (result.success && result.data.length > 0) {
+                        // Simulate what the frontend would do
+                        const searchParams = new URLSearchParams({
+                            checkIn: searchData.checkIn,
+                            checkOut: searchData.checkOut,
+                            guests: searchData.guests.toString(),
+                            results: JSON.stringify(result.data),
+                        });
+
+                        const searchResultsUrl = `http://localhost:3001/search-results?${searchParams.toString()}`;
+
+                        document.getElementById("result").innerHTML += `
+                        <p><strong>Would redirect to:</strong></p>
+                        <a href="${searchResultsUrl}" target="_blank">${searchResultsUrl}</a>
+                    `;
+                    }
+                } catch (error) {
+                    document.getElementById("result").innerHTML = `
+                    <h2>Error:</h2>
+                    <p style="color: red;">${error.message}</p>
+                `;
+                }
+            }
+        </script>
+    </body>
+</html>

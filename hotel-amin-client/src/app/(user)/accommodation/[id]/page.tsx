@@ -24,6 +24,7 @@ import {
     addToCart as addItemToCart,
     CartItem as CartUtilItem,
 } from "@/app/utilities/cart-utils";
+import { generateBookingPDFFromResponse } from "@/app/utilities/pdf-generator";
 
 // Import auth components
 import SignInPage from "@/app/(user)/auth/SignInPage";
@@ -226,6 +227,27 @@ export default function RoomDetailsPage() {
 
             toast.success("Guest booking created successfully!");
             console.log("Guest booking response:", response.data);
+
+            // Generate PDF after successful booking
+            try {
+                generateBookingPDFFromResponse(
+                    response,
+                    {
+                        checkInDate,
+                        checkOutDate,
+                        guests,
+                        rooms,
+                        appliedCoupon,
+                    },
+                    roomData,
+                    guestData
+                );
+                toast.success("Booking confirmation PDF has been downloaded!");
+            } catch (pdfError) {
+                console.error("Error generating PDF:", pdfError);
+                toast.warn("Booking successful, but PDF generation failed");
+            }
+
             setShowGuestForm(false);
             // router.push("/booking-confirmation"); // Redirect to confirmation page
         } catch (error: any) {

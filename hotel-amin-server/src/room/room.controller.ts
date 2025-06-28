@@ -21,6 +21,7 @@ import { UpdateRoomItemDto } from './DTOs/update-roomItem.dto';
 import { AuthType } from 'src/auth/enums/auth-type.enum';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { GetRoomsDto } from './DTOs/get-rooms-dto';
+import { SearchRoomsDto } from './DTOs/search-rooms.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Controller('room')
@@ -83,7 +84,7 @@ export class RoomController {
     return this.roomService.updateHousekeepingStatus(roomNum, updateHKSDto);
   }
 
-  @Roles('admin', 'customer')
+  @Auth(AuthType.None)
   @Patch(':room_num/items/report-issue/:item_name')
   public reportIssue(
     @Param('room_num', ParseIntPipe) roomNum: number,
@@ -91,5 +92,23 @@ export class RoomController {
     @Body() ReportItemIssueDto: ReportItemIssueDto,
   ) {
     return this.roomService.reportIssue(roomNum, itemName, ReportItemIssueDto);
+  }
+
+  @Auth(AuthType.None)
+  @Get(':room_num/items')
+  public getRoomItems(@Param('room_num', ParseIntPipe) roomNum: number) {
+    return this.roomService.getRoomItems(roomNum);
+  }
+
+  // New endpoint for searching available rooms
+  @Auth(AuthType.None)
+  @Post('search')
+  @UsePipes(ValidationPipe)
+  public searchAvailableRooms(@Body() searchDto: SearchRoomsDto) {
+    return this.roomService.searchAvailableRooms(
+      searchDto.checkIn,
+      searchDto.checkOut,
+      searchDto.guests,
+    );
   }
 }

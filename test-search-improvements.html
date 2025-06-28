@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Hotel Search Feature Test</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f5f5f5;
+            }
+            .test-section {
+                background: white;
+                padding: 20px;
+                margin: 20px 0;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .status-pass {
+                color: #28a745;
+            }
+            .status-pending {
+                color: #ffc107;
+            }
+            .feature {
+                margin: 10px 0;
+                padding: 10px;
+                border-left: 4px solid #007bff;
+                background-color: #f8f9fa;
+            }
+            .improvement {
+                margin: 10px 0;
+                padding: 10px;
+                border-left: 4px solid #28a745;
+                background-color: #d4edda;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>🏨 Hotel Search Feature Improvements</h1>
+
+        <div class="test-section">
+            <h2>✅ Completed Improvements</h2>
+
+            <div class="improvement">
+                <h3>1. Dynamic Guest Selection</h3>
+                <p>
+                    <strong>Before:</strong> Fixed dropdown with options 1-10
+                    guests
+                </p>
+                <p>
+                    <strong>After:</strong> Flexible input with +/- buttons,
+                    supports 1-20 guests
+                </p>
+                <ul>
+                    <li>Users can type directly in the input field</li>
+                    <li>+ and - buttons for easy increment/decrement</li>
+                    <li>Range validation (1-20 guests)</li>
+                    <li>Visual feedback showing current guest count</li>
+                </ul>
+            </div>
+
+            <div class="improvement">
+                <h3>2. Enhanced Search Validation</h3>
+                <p>Added comprehensive validation for the search form:</p>
+                <ul>
+                    <li>Check that both dates are selected</li>
+                    <li>Prevent past date selection</li>
+                    <li>Validate date sequence (check-out after check-in)</li>
+                    <li>Guest count validation (1-20 range)</li>
+                    <li>Better error messages for user guidance</li>
+                </ul>
+            </div>
+
+            <div class="improvement">
+                <h3>3. Button Style Consistency</h3>
+                <p>
+                    Search results page buttons now exactly match accommodation
+                    details page:
+                </p>
+                <ul>
+                    <li>
+                        <strong>View Details:</strong> btn btn-outline
+                        btn-primary
+                    </li>
+                    <li><strong>Book Now:</strong> btn btn-primary</li>
+                    <li>Same styling, spacing, and visual hierarchy</li>
+                    <li>Consistent hover effects and accessibility</li>
+                </ul>
+            </div>
+
+            <div class="improvement">
+                <h3>4. Improved Search Results Display</h3>
+                <ul>
+                    <li>Enhanced room information display</li>
+                    <li>Added room category information when available</li>
+                    <li>Better visual hierarchy and spacing</li>
+                    <li>Clearer pricing and total calculation</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 Technical Changes Made</h2>
+
+            <div class="feature">
+                <h3>Frontend Changes</h3>
+                <p>
+                    <strong>File:</strong> <code>src/component/Home.tsx</code>
+                </p>
+                <ul>
+                    <li>
+                        Replaced guest dropdown with flexible input + controls
+                    </li>
+                    <li>Enhanced search validation logic</li>
+                    <li>Better error handling and user feedback</li>
+                </ul>
+            </div>
+
+            <div class="feature">
+                <h3>Search Results Page</h3>
+                <p>
+                    <strong>File:</strong>
+                    <code>src/app/(user)/search-results/page.tsx</code>
+                </p>
+                <ul>
+                    <li>Updated button classes for consistency</li>
+                    <li>Added category display</li>
+                    <li>Improved room information layout</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎯 Feature Testing Guide</h2>
+
+            <div class="feature">
+                <h3>Test Guest Selection</h3>
+                <ol>
+                    <li>Go to the home page</li>
+                    <li>
+                        In the search bar, test the guest selector:
+                        <ul>
+                            <li>Click + and - buttons to change guest count</li>
+                            <li>Type directly in the input field</li>
+                            <li>
+                                Try values outside 1-20 range (should be
+                                corrected)
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        Verify the display shows "X Guest" or "X Guests"
+                        correctly
+                    </li>
+                </ol>
+            </div>
+
+            <div class="feature">
+                <h3>Test Search Functionality</h3>
+                <ol>
+                    <li>
+                        Try searching without selecting dates (should show
+                        error)
+                    </li>
+                    <li>
+                        Try selecting a past check-in date (should show error)
+                    </li>
+                    <li>Try check-out before check-in (should show error)</li>
+                    <li>Make a valid search and verify results page loads</li>
+                </ol>
+            </div>
+
+            <div class="feature">
+                <h3>Test Results Page</h3>
+                <ol>
+                    <li>
+                        Verify "View Details" button style matches accommodation
+                        page
+                    </li>
+                    <li>
+                        Verify "Book Now" button style matches accommodation
+                        page
+                    </li>
+                    <li>
+                        Click "View Details" → should go to accommodation
+                        details
+                    </li>
+                    <li>
+                        Click "Book Now" → should go to booking page with
+                        correct data
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🚀 How to Run and Test</h2>
+            <div class="feature">
+                <h3>Backend (Terminal 1)</h3>
+                <pre>
+cd hotel-amin-server
+npm run start:dev</pre
+                >
+            </div>
+
+            <div class="feature">
+                <h3>Frontend (Terminal 2)</h3>
+                <pre>
+cd hotel-amin-client
+npm run dev</pre
+                >
+            </div>
+
+            <div class="feature">
+                <h3>Access Application</h3>
+                <p>
+                    Open browser and go to:
+                    <a href="http://localhost:3001">http://localhost:3001</a>
+                </p>
+                <p>Test the search functionality in the hero section</p>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>✨ Key Improvements Summary</h2>
+            <p class="status-pass">
+                <strong>✅ Guest Selection:</strong> Now flexible with +/-
+                controls, supports 1-20 guests
+            </p>
+            <p class="status-pass">
+                <strong>✅ Search Validation:</strong> Comprehensive validation
+                with clear error messages
+            </p>
+            <p class="status-pass">
+                <strong>✅ Button Consistency:</strong> Search results buttons
+                match accommodation details page
+            </p>
+            <p class="status-pass">
+                <strong>✅ User Experience:</strong> Better feedback,
+                validation, and navigation flow
+            </p>
+        </div>
+    </body>
+</html>
