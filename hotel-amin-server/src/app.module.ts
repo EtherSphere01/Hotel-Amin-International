@@ -31,6 +31,7 @@ import { EmailModule } from './email/email.module';
 import { ConfigModule } from '@nestjs/config';
 import { PdfModule } from './pdf/pdf.module';
 import { AccommodationModule } from './accommodation/accommodation.module';
+import { DiscoverModule } from './discover/discover.module';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { AccommodationModule } from './accommodation/accommodation.module';
     ConfigModule.forRoot(),
     PdfModule,
     AccommodationModule,
+    DiscoverModule,
   ],
   controllers: [AppController],
   providers: [
