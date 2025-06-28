@@ -1,32 +1,216 @@
 'use client';
-import React, { useState } from 'react';
-import { User, Bed, Utensils, Search, Plus, Edit2, Trash2, Save, X, Bell, Settings, LogOut, Calendar, DollarSign, Users, Home, Menu, Ticket, Gift } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { User, Bed, Utensils, Search, Plus, Edit2, Trash2, X, LogOut, Calendar, Menu, Ticket, Gift } from "lucide-react";
+
+// API Base URL
+const API_BASE_URL = 'http://localhost:3000';
 
 const App = () => {
   const [activeTab, setActiveTab] = useState<'users' | 'rooms' | 'food' | 'coupons' | 'offers'>('users');
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Changed default to false for mobile-first
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Data states
+  const [users, setUsers] = useState<any[]>([]);
+  const [rooms, setRooms] = useState<any[]>([]);
+  const [food, setFood] = useState<any[]>([]);
+  const [coupons, setCoupons] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<any[]>([]);
+  
+  // Loading states
+  const [loading, setLoading] = useState({
+    users: false,
+    rooms: false,
+    food: false,
+    coupons: false,
+    bookings: false
+  });
+  
+  // Error states
+  const [errors, setErrors] = useState({
+    users: null,
+    rooms: null,
+    food: null,
+    coupons: null,
+    bookings: null
+  });
 
-  // Sample data for display
-  const users = [
-    { id: 1, name: 'John Smith', email: 'john@email.com', phone: '+1-555-0123', checkIn: '2024-06-25', checkOut: '2024-06-30', roomNumber: '101', status: 'active' },
-    { id: 2, name: 'Sarah Johnson', email: 'sarah@email.com', phone: '+1-555-0124', checkIn: '2024-06-24', checkOut: '2024-06-28', roomNumber: '205', status: 'active' },
-    { id: 3, name: 'Mike Wilson', email: 'mike@email.com', phone: '+1-555-0125', checkIn: '2024-06-20', checkOut: '2024-06-25', roomNumber: '312', status: 'checked-out' }
-  ];
+  // Stats
+  const [stats, setStats] = useState({
+    availableRooms: 0,
+    occupiedRooms: 0,
+    activeCoupons: 0,
+    expiredCoupons: 0,
+    activeOffers: 0,
+    expiredOffers: 0,
+    todayRevenue: 0
+  });
 
-  const rooms = [
-    { id: 1, number: '101', type: 'single', price: 120, status: 'occupied', features: 'WiFi, AC, TV, Mini Bar' },
-    { id: 2, number: '205', type: 'double', price: 180, status: 'occupied', features: 'WiFi, AC, TV, Mini Bar, Balcony' },
-    { id: 3, number: '312', type: 'suite', price: 350, status: 'available', features: 'WiFi, AC, TV, Mini Bar, Kitchen, Living Room' },
-    { id: 4, number: '401', type: 'deluxe', price: 500, status: 'maintenance', features: 'WiFi, AC, TV, Mini Bar, Jacuzzi, Balcony, Butler Service' }
-  ];
+  // Fetch data functions
+  const fetchRooms = async () => {
+    setLoading(prev => ({ ...prev, rooms: true }));
+    try {
+      const response = await fetch(`${API_BASE_URL}/room/all`);
+      if (!response.ok) throw new Error('Failed to fetch rooms');
+      const data = await response.json();
+      
+      // Handle paginated response
+      const roomsData = data.data || data;
+      setRooms(roomsData);
+      
+      // Update room stats
+      const available = roomsData.filter((room: any) => room.room_status === 'available').length;
+      const occupied = roomsData.filter((room: any) => room.room_status === 'occupied').length;
+      setStats(prev => ({ 
+        ...prev, 
+        availableRooms: available, 
+        occupiedRooms: occupied 
+      }));
+      
+      setErrors(prev => ({ ...prev, rooms: null }));
+    } catch (error) {
+      console.error('Error fetching rooms:', error);
+      setErrors(prev => ({ ...prev, rooms: 'Failed to load rooms' }));
+    } finally {
+      setLoading(prev => ({ ...prev, rooms: false }));
+    }
+  };
 
-  const food = [
-    { id: 1, name: 'Caesar Salad', category: 'appetizer', price: 12, description: 'Fresh romaine lettuce with parmesan and croutons', availability: true },
-    { id: 2, name: 'Grilled Salmon', category: 'main', price: 28, description: 'Atlantic salmon with herbs and lemon butter', availability: true },
-    { id: 3, name: 'Chocolate Cake', category: 'dessert', price: 8, description: 'Rich chocolate cake with berry compote', availability: false },
-    { id: 4, name: 'Wine Selection', category: 'beverage', price: 15, description: 'Premium house wine selection', availability: true }
-  ];
+  const fetchFood = async () => {
+    setLoading(prev => ({ ...prev, food: true }));
+    try {
+      const response = await fetch(`${API_BASE_URL}/restaurant/menu`);
+      if (!response.ok) throw new Error('Failed to fetch menu');
+      const data = await response.json();
+      setFood(data);
+      setErrors(prev => ({ ...prev, food: null }));
+    } catch (error) {
+      console.error('Error fetching menu:', error);
+      setErrors(prev => ({ ...prev, food: 'Failed to load menu items' }));
+    } finally {
+      setLoading(prev => ({ ...prev, food: false }));
+    }
+  };
 
+  const fetchCoupons = async () => {
+    setLoading(prev => ({ ...prev, coupons: true }));
+    try {
+      const response = await fetch(`${API_BASE_URL}/coupon/all`);
+      if (!response.ok) throw new Error('Failed to fetch coupons');
+      const data = await response.json();
+      setCoupons(data);
+      
+      // Update coupon stats
+      const active = data.filter((coupon: any) => coupon.is_active).length;
+      const expired = data.filter((coupon: any) => !coupon.is_active).length;
+      setStats(prev => ({ 
+        ...prev, 
+        activeCoupons: active, 
+        expiredCoupons: expired 
+      }));
+      
+      setErrors(prev => ({ ...prev, coupons: null }));
+    } catch (error) {
+      console.error('Error fetching coupons:', error);
+      setErrors(prev => ({ ...prev, coupons: 'Failed to load coupons' }));
+    } finally {
+      setLoading(prev => ({ ...prev, coupons: false }));
+    }
+  };
+
+  const fetchBookings = async () => {
+    setLoading(prev => ({ ...prev, bookings: true }));
+    try {
+      const response = await fetch(`${API_BASE_URL}/booking/all`);
+      if (!response.ok) throw new Error('Failed to fetch bookings');
+      const data = await response.json();
+      setBookings(data);
+      
+      // Calculate revenue (simplified - today's bookings total)
+      const today = new Date().toISOString().split('T')[0];
+      const todayBookings = data.filter((booking: any) => 
+        booking.booking_date && booking.booking_date.startsWith(today)
+      );
+      const revenue = todayBookings.reduce((sum: number, booking: any) => 
+        sum + (booking.total_price || 0), 0
+      );
+      setStats(prev => ({ ...prev, todayRevenue: revenue }));
+      
+      // Extract user data from bookings for guest management
+      const guestsData = data.map((booking: any, index: number) => ({
+        id: booking.booking_id || index + 1,
+        name: `Guest ${booking.booking_id}`, // Since we don't have user names directly
+        email: 'guest@hotel.com', // Placeholder
+        phone: booking.user_phone || 'N/A',
+        checkIn: booking.checkin_date ? new Date(booking.checkin_date).toLocaleDateString() : 'N/A',
+        checkOut: booking.checkout_date ? new Date(booking.checkout_date).toLocaleDateString() : 'N/A',
+        roomNumber: booking.rooms?.[0]?.room_num || 'N/A',
+        status: booking.payment_status === 'paid' ? 'active' : 'pending'
+      }));
+      setUsers(guestsData);
+      
+      setErrors(prev => ({ ...prev, bookings: null }));
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+      setErrors(prev => ({ ...prev, bookings: 'Failed to load bookings' }));
+    } finally {
+      setLoading(prev => ({ ...prev, bookings: false }));
+    }
+  };
+
+  // Load data on component mount
+  useEffect(() => {
+    fetchRooms();
+    fetchFood();
+    fetchCoupons();
+    fetchBookings();
+  }, []);
+
+  // Refresh all data
+  const refreshAllData = () => {
+    fetchRooms();
+    fetchFood();
+    fetchCoupons();
+    fetchBookings();
+  };
+
+  // Transform API data for display
+  const transformRoomData = (apiRoom: any) => ({
+    id: apiRoom.room_num,
+    number: apiRoom.room_num.toString(),
+    type: apiRoom.type || 'standard',
+    price: parseFloat(apiRoom.room_price || 0),
+    status: apiRoom.room_status,
+    features: apiRoom.description || 'Standard amenities included'
+  });
+
+  const transformFoodData = (apiFood: any) => ({
+    id: apiFood.food_id,
+    name: apiFood.item_name,
+    category: apiFood.food_type,
+    price: parseFloat(apiFood.item_price || 0),
+    description: apiFood.description || 'Delicious menu item',
+    availability: apiFood.availability
+  });
+
+  const transformCouponData = (apiCoupon: any) => ({
+    id: apiCoupon.coupon_id,
+    code: apiCoupon.coupon_code,
+    discount: apiCoupon.coupon_percent,
+    type: 'percentage',
+    description: `${apiCoupon.coupon_percent}% discount coupon`,
+    validFrom: apiCoupon.created_at ? new Date(apiCoupon.created_at).toLocaleDateString() : 'N/A',
+    validUntil: apiCoupon.expire_at ? new Date(apiCoupon.expire_at).toLocaleDateString() : 'N/A',
+    status: apiCoupon.is_active ? 'active' : 'expired',
+    usageCount: 0, // Not available in current API
+    maxUsage: apiCoupon.quantity || 100
+  });
+
+  // Transformed data for rendering
+  const displayRooms = rooms.map(transformRoomData);
+  const displayFood = food.map(transformFoodData);
+  const displayCoupons = coupons.map(transformCouponData);
+
+  // Sample offers data (since no API endpoint exists yet)
   const offers = [
     { 
       id: 1, 
@@ -86,13 +270,6 @@ const App = () => {
     }
   ];
 
-  const coupons = [
-    { id: 1, code: 'WELCOME20', discount: 20, type: 'percentage', description: 'Welcome discount for new guests', validFrom: '2024-06-01', validUntil: '2024-12-31', status: 'active', usageCount: 45, maxUsage: 100 },
-    { id: 2, code: 'SUMMER50', discount: 50, type: 'fixed', description: 'Summer special discount', validFrom: '2024-06-01', validUntil: '2024-08-31', status: 'active', usageCount: 23, maxUsage: 50 },
-    { id: 3, code: 'FAMILY15', discount: 15, type: 'percentage', description: 'Family package discount', validFrom: '2024-01-01', validUntil: '2024-12-31', status: 'active', usageCount: 78, maxUsage: 200 },
-    { id: 4, code: 'EXPIRED10', discount: 10, type: 'percentage', description: 'Expired promotional code', validFrom: '2024-01-01', validUntil: '2024-05-31', status: 'expired', usageCount: 120, maxUsage: 100 }
-  ];
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': case 'available': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
@@ -105,9 +282,9 @@ const App = () => {
 
   const sidebarItems = [
     { key: 'users', label: 'User Management', icon: User, count: users.length },
-    { key: 'rooms', label: 'Room Management', icon: Bed, count: rooms.length },
-    { key: 'food', label: 'Food & Beverage', icon: Utensils, count: food.length },
-    { key: 'coupons', label: 'Coupon Management', icon: Ticket, count: coupons.length },
+    { key: 'rooms', label: 'Room Management', icon: Bed, count: displayRooms.length },
+    { key: 'food', label: 'Food & Beverage', icon: Utensils, count: displayFood.length },
+    { key: 'coupons', label: 'Coupon Management', icon: Ticket, count: displayCoupons.length },
     { key: 'offers', label: 'Offers & Packages', icon: Gift, count: offers.length }
   ];
 
@@ -194,6 +371,15 @@ const App = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-2 lg:space-x-4">
+                <button 
+                  onClick={refreshAllData}
+                  className="p-2 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors hidden sm:block"
+                  title="Refresh all data"
+                >
+                  <svg className="w-5 h-5 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
                 <button className="p-2 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors hidden sm:block">
                   <LogOut className="w-5 h-5 lg:w-6 lg:h-6" />
                 </button>
@@ -209,8 +395,8 @@ const App = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-slate-600 text-xs lg:text-sm font-medium">Available Rooms</p>
-                  <p className="text-xl lg:text-2xl font-bold text-slate-800 mt-1">8</p>
-                  <p className="text-amber-600 text-xs mt-1">16 occupied</p>
+                  <p className="text-xl lg:text-2xl font-bold text-slate-800 mt-1">{stats.availableRooms}</p>
+                  <p className="text-amber-600 text-xs mt-1">{stats.occupiedRooms} occupied</p>
                 </div>
               </div>
             </div>
@@ -219,8 +405,8 @@ const App = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-slate-600 text-xs lg:text-sm font-medium">Active Coupons</p>
-                  <p className="text-xl lg:text-2xl font-bold text-slate-800 mt-1">{coupons.filter(c => c.status === 'active').length}</p>
-                  <p className="text-orange-600 text-xs mt-1">{coupons.filter(c => c.status === 'expired').length} expired</p>
+                  <p className="text-xl lg:text-2xl font-bold text-slate-800 mt-1">{stats.activeCoupons}</p>
+                  <p className="text-orange-600 text-xs mt-1">{stats.expiredCoupons} expired</p>
                 </div>
               </div>
             </div>
@@ -239,8 +425,8 @@ const App = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-slate-600 text-xs lg:text-sm font-medium">Revenue Today</p>
-                  <p className="text-xl lg:text-2xl font-bold text-slate-800 mt-1">$2,849</p>
-                  <p className="text-emerald-600 text-xs mt-1">↗ +15% from yesterday</p>
+                  <p className="text-xl lg:text-2xl font-bold text-slate-800 mt-1">${stats.todayRevenue.toLocaleString()}</p>
+                  <p className="text-emerald-600 text-xs mt-1">↗ Real-time data</p>
                 </div>
               </div>
             </div>
@@ -294,7 +480,7 @@ const App = () => {
                                 <div className="flex items-center">
                                   <div className="flex-shrink-0 h-10 w-10 lg:h-12 lg:w-12">
                                     <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-sm lg:text-lg">
-                                      {user.name.split(' ').map(n => n[0]).join('')}
+                                      {user.name.split(' ').map((n: string) => n[0]).join('')}
                                     </div>
                                   </div>
                                   <div className="ml-4">
@@ -372,7 +558,20 @@ const App = () => {
 
                   {/* Rooms Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-                    {rooms.map((room) => (
+                    {loading.rooms ? (
+                      <div className="col-span-full flex justify-center items-center py-8">
+                        <div className="text-slate-600">Loading rooms...</div>
+                      </div>
+                    ) : errors.rooms ? (
+                      <div className="col-span-full flex justify-center items-center py-8">
+                        <div className="text-red-600">{errors.rooms}</div>
+                      </div>
+                    ) : displayRooms.length === 0 ? (
+                      <div className="col-span-full flex justify-center items-center py-8">
+                        <div className="text-slate-600">No rooms found</div>
+                      </div>
+                    ) : (
+                      displayRooms.map((room) => (
                       <div key={room.id} className="bg-white rounded-xl shadow-lg border border-slate-200 hover:shadow-xl transition-shadow overflow-hidden">
                         <div className="p-4 lg:p-6">
                           <div className="flex items-center justify-between mb-4">
@@ -414,7 +613,8 @@ const App = () => {
                           </div>
                         </div>
                       </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 </div>
               )}
@@ -445,7 +645,20 @@ const App = () => {
 
                   {/* Food Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-                    {food.map((item) => (
+                    {loading.food ? (
+                      <div className="col-span-full flex justify-center items-center py-8">
+                        <div className="text-slate-600">Loading menu items...</div>
+                      </div>
+                    ) : errors.food ? (
+                      <div className="col-span-full flex justify-center items-center py-8">
+                        <div className="text-red-600">{errors.food}</div>
+                      </div>
+                    ) : displayFood.length === 0 ? (
+                      <div className="col-span-full flex justify-center items-center py-8">
+                        <div className="text-slate-600">No menu items found</div>
+                      </div>
+                    ) : (
+                      displayFood.map((item) => (
                       <div key={item.id} className="bg-white rounded-xl shadow-lg border border-slate-200 hover:shadow-xl transition-shadow overflow-hidden">
                         <div className="p-4 lg:p-6">
                           <div className="flex items-start justify-between mb-4">
@@ -488,7 +701,8 @@ const App = () => {
                           </div>
                         </div>
                       </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 </div>
               )}
@@ -519,7 +733,20 @@ const App = () => {
 
                   {/* Coupons Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-                    {coupons.map((coupon) => (
+                    {loading.coupons ? (
+                      <div className="col-span-full flex justify-center items-center py-8">
+                        <div className="text-slate-600">Loading coupons...</div>
+                      </div>
+                    ) : errors.coupons ? (
+                      <div className="col-span-full flex justify-center items-center py-8">
+                        <div className="text-red-600">{errors.coupons}</div>
+                      </div>
+                    ) : displayCoupons.length === 0 ? (
+                      <div className="col-span-full flex justify-center items-center py-8">
+                        <div className="text-slate-600">No coupons found</div>
+                      </div>
+                    ) : (
+                      displayCoupons.map((coupon) => (
                       <div key={coupon.id} className="bg-white rounded-xl shadow-lg border border-slate-200 hover:shadow-xl transition-shadow overflow-hidden">
                         <div className="p-4 lg:p-6">
                           <div className="flex items-start justify-between mb-4">
@@ -594,7 +821,8 @@ const App = () => {
                           </div>
                         </div>
                       </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 </div>
               )}
