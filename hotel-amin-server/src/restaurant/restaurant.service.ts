@@ -46,8 +46,8 @@ export class RestaurantService {
             food_price: food.item_price,
             order_date: new Date(),
             food,
-            booking: { booking_id: dto.bookingId } as any,      // Mocked booking
-            billed_by: { employee_id: dto.employeeId } as any,  // Mocked employee
+            booking: { booking_id: dto.bookingId } as any,      
+            billed_by: { employee_id: dto.employeeId } as any, 
         });
 
         return this.historyRepo.save(order);

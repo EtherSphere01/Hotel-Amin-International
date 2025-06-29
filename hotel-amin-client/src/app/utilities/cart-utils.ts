@@ -1,4 +1,3 @@
-// Cart utility functions
 export interface CartItem {
     id: number;
     title: string;
@@ -29,7 +28,6 @@ export const saveCartItems = (items: CartItem[]): void => {
     try {
         if (typeof window !== "undefined") {
             localStorage.setItem(CART_KEY, JSON.stringify(items));
-            // Dispatch custom event to notify other components
             window.dispatchEvent(new Event("cartUpdated"));
         }
     } catch (error) {
@@ -45,10 +43,8 @@ export const addToCart = (item: CartItem): boolean => {
         );
 
         if (existingItemIndex !== -1) {
-            // Update existing item
             cartItems[existingItemIndex] = item;
         } else {
-            // Add new item
             cartItems.push(item);
         }
 

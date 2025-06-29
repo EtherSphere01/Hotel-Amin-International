@@ -27,7 +27,6 @@ import {
 import AccommodationSlider from "./AccommodationSlider";
 import DiscoverSection from "./DiscoverySection";
 
-// Interfaces
 interface BookingReview {
     review_id: number;
     review_text: string;
@@ -45,7 +44,6 @@ interface BookingReview {
     };
 }
 
-// Fake FAQs data
 const faqs = [
     {
         question: "Is there any extra charge like room service and vat?",
@@ -65,7 +63,6 @@ const faqs = [
     },
 ];
 
-// Sample places data
 const places = [
     {
         title: "Inani Beach",
@@ -112,13 +109,11 @@ const Home = () => {
     const [reviews, setReviews] = useState<BookingReview[]>([]);
     const [reviewsLoading, setReviewsLoading] = useState(true);
 
-    // Helper function to get today's date in YYYY-MM-DD format
     const getTodayDate = () => {
         const today = new Date();
         return today.toISOString().split("T")[0];
     };
 
-    // Fetch reviews on component mount
     useEffect(() => {
         fetchBookingReviews();
     }, []);
@@ -141,7 +136,7 @@ const Home = () => {
                 const data = await response.json();
                 console.log("Reviews data received:", data);
                 console.log("Number of reviews:", data.length);
-                setReviews(data.slice(0, 6)); // Show only latest 6 reviews
+                setReviews(data.slice(0, 6)); 
             } else {
                 console.error(
                     "Failed to fetch reviews - Status:",
@@ -186,11 +181,10 @@ const Home = () => {
         try {
             setIsSearching(true);
 
-            // Validate dates
             const checkInDate = new Date(searchData.checkIn);
             const checkOutDate = new Date(searchData.checkOut);
             const today = new Date();
-            today.setHours(0, 0, 0, 0); // Reset time to beginning of day
+            today.setHours(0, 0, 0, 0); 
 
             if (!searchData.checkIn || !searchData.checkOut) {
                 toast.error("Please select both check-in and check-out dates");
@@ -207,7 +201,6 @@ const Home = () => {
                 return;
             }
 
-            // Validate guest count
             if (searchData.guests < 1 || searchData.guests > 20) {
                 toast.error("Number of guests must be between 1 and 20");
                 return;
@@ -221,7 +214,6 @@ const Home = () => {
 
             console.log("Search payload:", searchPayload);
 
-            // Make API call to search for available rooms
             const response = await fetch("http://localhost:3000/room/search", {
                 method: "POST",
                 headers: {
@@ -239,7 +231,6 @@ const Home = () => {
             }
 
             if (result.success && result.data) {
-                // Navigate to search results page with the search data
                 const searchParams = new URLSearchParams({
                     checkIn: searchData.checkIn,
                     checkOut: searchData.checkOut,

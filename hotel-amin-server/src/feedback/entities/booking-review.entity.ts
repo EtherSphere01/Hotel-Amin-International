@@ -17,10 +17,10 @@ export class BookingReview {
   review_text: string;
 
   @Column({ type: 'int', default: 5 })
-  rating: number; // 1-5 stars
+  rating: number;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
-  guest_name: string; // Display name for the review
+  guest_name: string; 
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_date: Date;

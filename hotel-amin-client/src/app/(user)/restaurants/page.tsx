@@ -66,9 +66,7 @@ const Restaurant = () => {
     };
 
     const getImageForFoodType = (foodType: string, itemName: string) => {
-        // Map specific food items to appropriate images
         const foodImages: { [key: string]: string } = {
-            // Breakfast items
             "paratha & dal":
                 "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop",
             "luchi & bor digh":
@@ -109,13 +107,11 @@ const Restaurant = () => {
                 "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?w=400&h=300&fit=crop",
         };
 
-        // Try to find specific image for the food item
         const itemKey = itemName.toLowerCase();
         if (foodImages[itemKey]) {
             return foodImages[itemKey];
         }
 
-        // Fallback to food type images
         const typeImages: { [key: string]: string } = {
             breakfast:
                 "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400&h=300&fit=crop",
@@ -224,9 +220,7 @@ const Restaurant = () => {
                     ))}
                 </div>
 
-                {/* Menu Items Display */}
                 {activeCategory === "all" ? (
-                    // Show all categories when 'all' is selected
                     categories.slice(1).map((category) => {
                         const categoryItems = getItemsByCategory(category.id);
                         if (categoryItems.length === 0) return null;
@@ -317,7 +311,6 @@ const Restaurant = () => {
                         );
                     })
                 ) : (
-                    // Show only selected category items
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredItems.map((item) => (
                             <div

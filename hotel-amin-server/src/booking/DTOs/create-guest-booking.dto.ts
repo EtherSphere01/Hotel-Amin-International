@@ -46,7 +46,6 @@ export class CreateGuestBookingDto {
   @IsInt()
   employee_id?: number;
 
-  // Guest Information
   @IsString()
   @IsNotEmpty()
   guest_name: string;

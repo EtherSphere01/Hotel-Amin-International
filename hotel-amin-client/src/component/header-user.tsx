@@ -42,7 +42,6 @@ const HeaderUser = () => {
     const modalRef = useRef<HTMLDivElement>(null);
     const servicesDropdownRef = useRef<HTMLDivElement>(null);
 
-    // Check authentication status
     const checkAuthStatus = () => {
         const token = localStorage.getItem("accessToken");
         if (token) {
@@ -60,13 +59,11 @@ const HeaderUser = () => {
         }
     };
 
-    // Update cart item count
     const updateCartCount = () => {
         const count = getCartItemCount();
         setCartItemCount(count);
     };
 
-    // Handle logout
     const handleLogout = async () => {
         try {
             await singOut();
@@ -78,26 +75,22 @@ const HeaderUser = () => {
         }
     };
 
-    // Handle successful signin/signup
     const handleAuthSuccess = () => {
         setSignInButton(false);
         setSignUpButton(false);
         checkAuthStatus();
     };
 
-    // Check auth status on component mount
     useEffect(() => {
         checkAuthStatus();
         updateCartCount();
 
-        // Listen for storage changes to update cart count
         const handleStorageChange = () => {
             updateCartCount();
         };
 
         window.addEventListener("storage", handleStorageChange);
 
-        // Also listen for custom cart update events
         window.addEventListener("cartUpdated", handleStorageChange);
 
         return () => {
@@ -109,16 +102,15 @@ const HeaderUser = () => {
     const handleSignInButton = (value: boolean) => {
         console.log("Sign In button clicked:", value);
         setSignInButton(value);
-        if (value) setSignUpButton(false); // Close signup when opening signin
+        if (value) setSignUpButton(false); 
     };
 
     const handleSignUpButton = (value: boolean) => {
         console.log("Sign Up button clicked:", value);
         setSignUpButton(value);
-        if (value) setSignInButton(false); // Close signin when opening signup
+        if (value) setSignInButton(false); 
     };
 
-    // Handle clicking outside modal to close it
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (
@@ -129,7 +121,6 @@ const HeaderUser = () => {
                 setSignUpButton(false);
             }
 
-            // Close services dropdown when clicking outside
             if (
                 servicesDropdownRef.current &&
                 !servicesDropdownRef.current.contains(event.target as Node)
@@ -398,7 +389,7 @@ const HeaderUser = () => {
                                     <Link
                                         key={link.href}
                                         href={link.href}
-                                        onClick={() => setMenuOpen(false)} // Close menu on link click
+                                        onClick={() => setMenuOpen(false)} 
                                         className={`cursor-pointer ${
                                             pathname === link.href
                                                 ? "text-white font-bold underline"
@@ -413,7 +404,7 @@ const HeaderUser = () => {
                                 <Link
                                     key={link.href}
                                     href={link.href}
-                                    onClick={() => setMenuOpen(false)} // Close menu on link click
+                                    onClick={() => setMenuOpen(false)}
                                     className={`cursor-pointer ${
                                         pathname === link.href
                                             ? "text-white font-bold underline"

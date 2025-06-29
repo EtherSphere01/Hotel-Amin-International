@@ -15,8 +15,8 @@ import { Accounts, PaymentType } from './entities/accounts.entity';
 import { CreateBookingDto } from './DTOs/create-booking.dto';
 import { CreateAccommodationBookingDto } from './DTOs/create-accommodation-booking.dto';
 import { CreateGuestBookingDto } from './DTOs/create-guest-booking.dto';
-import { Coupon } from '../coupon/entities/coupon.entity'; // Import Coupon entity
-import { CouponUsage } from '../coupon/entities/coupon-usage.entity'; // Import CouponUsage entity
+import { Coupon } from '../coupon/entities/coupon.entity'; 
+import { CouponUsage } from '../coupon/entities/coupon-usage.entity';
 import { CouponService } from 'src/coupon/coupon.service';
 import { RoomService } from 'src/room/room.service';
 import { Rooms, RoomStatus } from 'src/room/entities/room.entity';
@@ -32,11 +32,11 @@ export class BookingService {
     @InjectRepository(Accounts)
     private accountsRepo: Repository<Accounts>,
     @InjectRepository(Coupon)
-    private couponRepo: Repository<Coupon>, // Inject Coupon repo
+    private couponRepo: Repository<Coupon>,
     @InjectRepository(CouponUsage)
-    private couponUsageRepo: Repository<CouponUsage>, // Inject CouponUsage repo
+    private couponUsageRepo: Repository<CouponUsage>, 
 
-    private readonly couponService: CouponService, // Inject CouponService
+    private readonly couponService: CouponService, 
 
     private readonly roomService: RoomService,
     @InjectRepository(Rooms)
@@ -142,7 +142,6 @@ export class BookingService {
       await this.userRepository.save(user);
     }
 
-    // Create a new booking entry
     const booking = this.bookingRepo.create({
       checkin_date: dto.checkin_date,
       checkout_date: dto.checkout_date,
@@ -161,7 +160,6 @@ export class BookingService {
 
     const savedBooking = await this.bookingRepo.save(booking);
 
-    // Create coupon usage record if coupon was used
     if (couponCode) {
       try {
         const couponUsage = this.couponUsageRepo.create({
@@ -172,14 +170,11 @@ export class BookingService {
         });
         await this.couponUsageRepo.save(couponUsage);
       } catch (error) {
-        // If there's a unique constraint error, log it but don't fail the booking
-        // This handles the case where the database still has the unique constraint
         if (error.code === '23505') {
           console.log(
             `Coupon usage already recorded for: ${couponCode.coupon_code}`,
           );
         } else {
-          // For other errors, re-throw
           throw error;
         }
       }
@@ -224,7 +219,6 @@ export class BookingService {
     dto: CreateAccommodationBookingDto,
     userId: number,
   ) {
-    // Get accommodation details
     const accommodation = await this.accommodationRepository.findOne({
       where: { id: dto.accommodation_id },
     });
@@ -236,7 +230,6 @@ export class BookingService {
       );
     }
 
-    // Find available rooms of the accommodation type
     const availableRooms = await this.roomRepository.find({
       where: {
         type: accommodation.category,
@@ -252,18 +245,15 @@ export class BookingService {
       );
     }
 
-    // Calculate booking details
     const timeDifference =
       dto.checkout_date.getTime() - dto.checkin_date.getTime();
     const numberOfDays = Math.max(1, timeDifference / (1000 * 3600 * 24));
 
-    // Use accommodation price as base price
     let totalPrice = accommodation.price * dto.no_of_rooms * numberOfDays;
     let couponDiscount = 0;
     let mainCoupon = 0;
     let couponCode: Coupon | null = null;
 
-    // Handle coupon if provided
     if (dto.coupon_code) {
       const coupon = await this.couponService.getCouponByCode(dto.coupon_code);
 
@@ -290,7 +280,6 @@ export class BookingService {
       );
     }
 
-    // Get user details
     const user = await this.userRepository.findOne({
       where: { user_id: userId },
     });
@@ -299,7 +288,6 @@ export class BookingService {
       throw new HttpException('User not found.', HttpStatus.BAD_REQUEST);
     }
 
-    // Create booking
     const booking = this.bookingRepo.create({
       checkin_date: dto.checkin_date,
       checkout_date: dto.checkout_date,
@@ -318,7 +306,6 @@ export class BookingService {
 
     const savedBooking = await this.bookingRepo.save(booking);
 
-    // Assign rooms to booking and update room status
     const roomNumbers = availableRooms
       .slice(0, dto.no_of_rooms)
       .map((room) => room.room_num);
@@ -335,7 +322,6 @@ export class BookingService {
   }
 
   async createGuestBooking(dto: CreateGuestBookingDto) {
-    // Get accommodation details
     const accommodation = await this.accommodationRepository.findOne({
       where: { id: dto.accommodation_id },
     });
@@ -347,7 +333,6 @@ export class BookingService {
       );
     }
 
-    // Find available rooms of the accommodation type
     const availableRooms = await this.roomRepository.find({
       where: {
         type: accommodation.category,
@@ -363,18 +348,15 @@ export class BookingService {
       );
     }
 
-    // Calculate booking details
     const timeDifference =
       dto.checkout_date.getTime() - dto.checkin_date.getTime();
     const numberOfDays = Math.max(1, timeDifference / (1000 * 3600 * 24));
 
-    // Use accommodation price as base price
     let totalPrice = accommodation.price * dto.no_of_rooms * numberOfDays;
     let couponDiscount = 0;
     let mainCoupon = 0;
     let couponCode: Coupon | null = null;
 
-    // Handle coupon if provided
     if (dto.coupon_code) {
       const coupon = await this.couponService.getCouponByCode(dto.coupon_code);
 
@@ -401,7 +383,6 @@ export class BookingService {
       );
     }
 
-    // Create or find guest user
     let user = await this.userRepository.findOne({
       where: { phone: dto.guest_mobile },
     });
@@ -427,7 +408,6 @@ export class BookingService {
       await this.userRepository.save(user);
     }
 
-    // Create booking
     const booking = this.bookingRepo.create({
       checkin_date: dto.checkin_date,
       checkout_date: dto.checkout_date,
@@ -446,7 +426,6 @@ export class BookingService {
 
     const savedBooking = await this.bookingRepo.save(booking);
 
-    // Create coupon usage record if coupon was used
     if (couponCode) {
       try {
         const couponUsage = this.couponUsageRepo.create({
@@ -457,20 +436,16 @@ export class BookingService {
         });
         await this.couponUsageRepo.save(couponUsage);
       } catch (error) {
-        // If there's a unique constraint error, log it but don't fail the booking
-        // This handles the case where the database still has the unique constraint
         if (error.code === '23505') {
           console.log(
             `Coupon usage already recorded for: ${couponCode.coupon_code}`,
           );
         } else {
-          // For other errors, re-throw
           throw error;
         }
       }
     }
 
-    // Assign rooms to booking and update room status
     const roomNumbers = availableRooms
       .slice(0, dto.no_of_rooms)
       .map((room) => room.room_num);

@@ -124,14 +124,12 @@ export const roomSeedData = [
 export async function seedRooms(dataSource: DataSource) {
   const roomRepository = dataSource.getRepository(Rooms);
 
-  // Check if data already exists
   const existingRooms = await roomRepository.find();
   if (existingRooms.length > 0) {
     console.log('Room data already exists, skipping seed...');
     return;
   }
 
-  // Insert seed data
   const rooms = roomRepository.create(roomSeedData);
   await roomRepository.save(rooms);
   console.log('Room seed data inserted successfully!');

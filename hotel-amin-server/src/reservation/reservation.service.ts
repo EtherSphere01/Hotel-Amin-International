@@ -38,7 +38,6 @@ export class ReservationService {
     public readonly couponService: CouponService,
     public readonly roomService: RoomService,
     private readonly pdfService: PdfService,
-    // public readonly bookingService: BookingService,
   ) {}
 
   async createReservation(
@@ -102,7 +101,7 @@ export class ReservationService {
 
     const timeDifference = checkout_date.getTime() - checkin_date.getTime();
 
-    const numberOfDays = timeDifference / (1000 * 3600 * 24); // 1000 ms * 3600 s * 24 hours
+    const numberOfDays = timeDifference / (1000 * 3600 * 24);
 
     let totalPrice = 0;
     allRooms.forEach((room) => {

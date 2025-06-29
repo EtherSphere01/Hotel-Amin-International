@@ -51,14 +51,12 @@ export class HousekeepingController {
     return this.housekeepingService.remove(+id);
   }
 
-  // New endpoint for guest housekeeping requests (public)
   @Auth(AuthType.None)
   @Post('request')
   async submitRequest(@Body() dto: CreateHousekeepingRequestDto) {
     return this.housekeepingService.submitRequest(dto);
   }
 
-  // Admin endpoints for managing requests
   @Get('requests')
   async getAllRequests() {
     return this.housekeepingService.getAllRequests();

@@ -27,13 +27,12 @@ export class HousekeepingService {
     housekeeping.issue_report = dto.issue_report;
     housekeeping.cleaner_feedback = dto.cleaner_feedback;
 
-    // Temporarily mock relationships by assigning mock objects instead of querying repositories
-    housekeeping.room = { room_num: dto.room } as any; // Mocked room object
-    housekeeping.cleaned_by = { employee_id: dto.cleaned_by } as any; // Mocked employee object
-    housekeeping.supervisor = { employee_id: dto.supervisor } as any; // Mocked supervisor object
+    housekeeping.room = { room_num: dto.room } as any; 
+    housekeeping.cleaned_by = { employee_id: dto.cleaned_by } as any; 
+    housekeeping.supervisor = { employee_id: dto.supervisor } as any; 
 
     if (dto.booking) {
-      housekeeping.booking = { booking_id: dto.booking } as any; // Mocked booking object
+      housekeeping.booking = { booking_id: dto.booking } as any; 
     }
 
     return this.housekeepingRepo.save(housekeeping);
@@ -77,7 +76,6 @@ export class HousekeepingService {
     return this.housekeepingRepo.save(entry);
   }
 
-  // New method for guest housekeeping requests
   public async submitRequest(dto: CreateHousekeepingRequestDto) {
     try {
       this.logger.log(`Submitting housekeeping request for room ${dto.room}`);
@@ -90,7 +88,6 @@ export class HousekeepingService {
       const savedRequest = await this.housekeepingRequestRepo.save(request);
       this.logger.log(`Housekeeping request saved with ID: ${savedRequest.id}`);
 
-      // Send email notification (non-blocking)
       setImmediate(async () => {
         try {
           await this.emailService.sendHousekeepingRequestEmail({
@@ -123,14 +120,12 @@ export class HousekeepingService {
     }
   }
 
-  // Get all housekeeping requests (for admin)
   public async getAllRequests() {
     return this.housekeepingRequestRepo.find({
       order: { createdAt: 'DESC' },
     });
   }
 
-  // Update request status (for admin)
   public async updateRequestStatus(id: number, status: string) {
     const request = await this.housekeepingRequestRepo.findOneBy({ id });
     if (!request) {

@@ -71,7 +71,6 @@ export default function GuestRegistrationForm({
             [name]: value,
         }));
 
-        // Clear error when user starts typing
         if (errors[name]) {
             setErrors((prev) => ({
                 ...prev,
@@ -98,7 +97,6 @@ export default function GuestRegistrationForm({
         if (!formData.passportNid.trim())
             newErrors.passportNid = "Passport No./NID is required";
 
-        // Validate mobile number format
         if (
             formData.mobileNo &&
             !/^(\+880|880|0)?1[3-9]\d{8}$/.test(
@@ -108,7 +106,6 @@ export default function GuestRegistrationForm({
             newErrors.mobileNo = "Please enter a valid mobile number";
         }
 
-        // Validate age
         if (
             formData.age &&
             (isNaN(Number(formData.age)) ||

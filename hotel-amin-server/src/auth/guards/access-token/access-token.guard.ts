@@ -21,11 +21,8 @@ export class AccessTokenGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    // extract the request object from the context
     const request = context.switchToHttp().getRequest();
-    // extract the token from the request headers
     const token = this.extractRequestFromHeader(request);
-    // validate the token using the jwtService
     if (!token) {
       throw new UnauthorizedException('Token not found');
     }

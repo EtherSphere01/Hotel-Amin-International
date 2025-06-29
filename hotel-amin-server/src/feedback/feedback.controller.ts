@@ -30,7 +30,7 @@ export class FeedbackController {
     return await this.feedbackService.getFeebackByDate(date);
   }
 
-  // Booking Review Endpoints
+
   @Post('booking-review')
   public async createBookingReview(
     @Body() createBookingReviewDto: CreateBookingReviewDto,

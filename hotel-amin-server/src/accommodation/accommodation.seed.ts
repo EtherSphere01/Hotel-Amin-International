@@ -78,14 +78,12 @@ export const accommodationSeedData = [
 export async function seedAccommodations(dataSource: DataSource) {
   const accommodationRepository = dataSource.getRepository(Accommodation);
 
-  // Check if data already exists
   const existingAccommodations = await accommodationRepository.find();
   if (existingAccommodations.length > 0) {
     console.log('Accommodation data already exists, skipping seed...');
     return;
   }
 
-  // Insert seed data
   const accommodations = accommodationRepository.create(accommodationSeedData);
   await accommodationRepository.save(accommodations);
   console.log('Accommodation seed data inserted successfully!');

@@ -74,7 +74,7 @@ export class EmailService {
 
     const options: nodemailer.SendMailOptions = {
       from: this.configService.get<string>('EMAIL_USER'),
-      to: 'housekeeping@hotelamin.com', // Hotel's housekeeping email
+      to: 'housekeeping@hotelamin.com', 
       subject: `New Housekeeping Request - Room ${requestData.room} (#${requestData.requestId})`,
       html: htmlContent,
     };
@@ -123,10 +123,10 @@ export class EmailService {
 
     const options: nodemailer.SendMailOptions = {
       from: this.configService.get<string>('EMAIL_USER'),
-      to: 'universuswebtech@gmail.com', // Hotel's contact email
+      to: 'universuswebtech@gmail.com', 
       subject: contactData.subject,
       html: htmlContent,
-      replyTo: contactData.email, // Allow direct reply to the customer
+      replyTo: contactData.email, 
     };
 
     try {

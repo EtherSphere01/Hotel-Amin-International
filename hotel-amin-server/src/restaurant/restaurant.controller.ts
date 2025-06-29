@@ -18,7 +18,6 @@ import { AuthType } from 'src/auth/enums/auth-type.enum';
 export class RestaurantController {
     constructor(private readonly restaurantService: RestaurantService) { }
 
-    // Menu
     @Post('menu')
     createItem(@Body() body: CreateMenuItemDto) {
         return this.restaurantService.createMenuItem(body);
@@ -46,7 +45,6 @@ export class RestaurantController {
         return this.restaurantService.deleteMenuItem(+id);
     }
 
-    // Orders
     @Post('order')
     placeOrder(@Body() body: PlaceOrderDto) {
         return this.restaurantService.placeOrder(body);

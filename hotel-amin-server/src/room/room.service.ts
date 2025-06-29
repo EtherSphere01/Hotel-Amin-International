@@ -17,7 +17,7 @@ import { Paginated } from 'src/common/pagination/interfaces/paginated.interface'
 import { PaginationProvider } from 'src/common/pagination/providers/pagination.provider';
 import { Reservation } from 'src/reservation/entities/reservation.entity';
 import { Booking } from 'src/booking/entities/booking.entity';
-import { EmailService } from 'src/email/email.service'; // Add this import
+import { EmailService } from 'src/email/email.service'; 
 import { Accommodation } from 'src/accommodation/accommodation.entity';
 import { join } from 'path';
 import { readFileSync } from 'fs';
@@ -117,7 +117,6 @@ export class RoomService {
 
     const EMAIL_USER = process.env.EMAIL_USER || 'universuswebtech@gmail.com';
 
-    // Send email asynchronously without blocking the response
     this.sendIssueReportEmail(
       EMAIL_USER,
       room_num,
@@ -282,7 +281,6 @@ export class RoomService {
     status: string,
   ) {
     try {
-      // Set a timeout for email sending to prevent hanging
       const emailPromise = this.emailService.sendEmail({
         recipients: [email],
         subject: `Issue Reported for Room ${roomNumber} - ${itemName}`,
@@ -296,7 +294,6 @@ export class RoomService {
         `,
       });
 
-      // Add timeout to prevent hanging
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Email timeout')), 5000),
       );
@@ -305,8 +302,6 @@ export class RoomService {
       console.log('Issue report email sent successfully');
     } catch (error) {
       console.error('Error sending issue report email:', error.message);
-      // Don't throw error to prevent API from failing
-      // Just log it and continue
     }
   }
 
@@ -325,7 +320,6 @@ export class RoomService {
         guests,
       });
 
-      // Validate dates
       if (checkInDate >= checkOutDate) {
         throw new NotFoundException(
           'Check-out date must be after check-in date',
@@ -336,15 +330,12 @@ export class RoomService {
         throw new NotFoundException('Check-in date cannot be in the past');
       }
 
-      // For now, let's use accommodations as available "rooms"
-      // In a real system, you'd have actual room inventory linked to accommodations
       const accommodations = await this.accommodationRepository.find();
 
       console.log(`Found ${accommodations.length} accommodations`);
 
-      // Transform accommodations to look like available rooms
       const availableRooms = accommodations.map((acc, index) => ({
-        room_num: 100 + acc.id, // Generate room numbers based on accommodation ID
+        room_num: 100 + acc.id,
         room_type: acc.title,
         price_per_night: parseFloat(acc.price.toString()),
         room_status: 'available',
@@ -356,7 +347,6 @@ export class RoomService {
         specs: acc.specs,
       }));
 
-      // Filter by guest capacity if specified
       let filteredRooms = availableRooms;
       if (guests && guests > 0) {
         filteredRooms = availableRooms.filter(

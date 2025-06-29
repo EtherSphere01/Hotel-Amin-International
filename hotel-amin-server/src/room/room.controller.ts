@@ -117,7 +117,6 @@ export class RoomController {
     return this.roomService.getRoomItems(roomNum);
   }
 
-  // New endpoint for searching available rooms
   @Auth(AuthType.None)
   @Post('search')
   @UsePipes(ValidationPipe)

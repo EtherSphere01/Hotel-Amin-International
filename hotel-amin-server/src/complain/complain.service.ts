@@ -28,7 +28,6 @@ export class ComplainService {
       createComplaintDto;
 
     try {
-      // Verify that the room exists
       const room = await this.roomRepository.findOne({
         where: { room_num },
       });
@@ -37,7 +36,6 @@ export class ComplainService {
         throw new NotFoundException(`Room ${room_num} does not exist`);
       }
 
-      // Verify that the item exists in the specified room
       const roomItem = await this.roomItemRepository.findOne({
         where: {
           room: { room_num },
@@ -52,10 +50,8 @@ export class ComplainService {
         );
       }
 
-      // Get hotel email from environment or use default
       const hotelEmail = process.env.EMAIL_USER || 'universuswebtech@gmail.com';
 
-      // Send complaint email asynchronously without blocking the response
       this.emailService
         .sendEmail({
           recipients: [hotelEmail],

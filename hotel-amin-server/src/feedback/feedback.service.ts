@@ -64,7 +64,6 @@ export class FeedbackService {
     return feedback;
   }
 
-  // Booking Review Methods
   public async createBookingReview(
     createBookingReviewDto: CreateBookingReviewDto,
   ) {
@@ -82,7 +81,6 @@ export class FeedbackService {
       throw new NotFoundException('Booking not found');
     }
 
-    // Check if review already exists for this booking
     const existingReview = await this.bookingReviewRepository.findOne({
       where: { booking: { booking_id: createBookingReviewDto.booking_id } },
     });

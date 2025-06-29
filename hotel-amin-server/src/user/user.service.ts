@@ -91,7 +91,6 @@ export class UserService {
     }
   }
 
-  // Update Profile (without password validation)----------------------------------------------------
   public async updateProfile(
     userId: number,
     updateProfileDto: UpdateProfileDto,
@@ -104,7 +103,6 @@ export class UserService {
       return { message: 'User not found' };
     }
 
-    // Check if phone number is being changed and if it already exists
     if (updateProfileDto.phone && updateProfileDto.phone !== user.phone) {
       const existPhone = await this.userRepository.findOne({
         where: { phone: updateProfileDto.phone },
@@ -114,12 +112,10 @@ export class UserService {
       }
     }
 
-    // Update user fields
     Object.assign(user, updateProfileDto);
 
     try {
       await this.userRepository.save(user);
-      // Remove password from response
       const { password, ...userWithoutPassword } = user;
       return {
         message: 'Profile updated successfully',
@@ -130,7 +126,6 @@ export class UserService {
     }
   }
 
-  // Find User By Phone----------------------------------------------------
   public async findUserByPhone(phone: string) {
     try {
       const user = await this.userRepository.findOne({
@@ -143,7 +138,6 @@ export class UserService {
     }
   }
 
-  // Find User By ID----------------------------------------------------
   public async findUserById(id: number) {
     try {
       const user = await this.userRepository.findOne({
@@ -151,7 +145,6 @@ export class UserService {
       });
 
       if (user) {
-        // Remove password from response for security
         const { password, ...userWithoutPassword } = user;
         return userWithoutPassword;
       }
@@ -161,7 +154,6 @@ export class UserService {
     }
   }
 
-  // Welcome Mail----------------------------------------------------
 
   private async sendWelcomeEmail(email: string, createUserDto?: CreateUserDto) {
     try {
@@ -201,12 +193,10 @@ export class UserService {
     }
   }
 
-  // Get User Booking History----------------------------------------------------
   public async getUserBookingHistory(userId: number) {
     try {
       console.log('Fetching booking history for user ID:', userId);
 
-      // First, let's check if there are any reservations at all for this user WITHOUT relations
       const reservationsWithoutRelations =
         await this.reservationRepository.find({
           where: { user_id: userId },
@@ -218,7 +208,6 @@ export class UserService {
         reservationsWithoutRelations.length,
       );
 
-      // Now try with relations
       const reservations = await this.reservationRepository.find({
         where: { user_id: userId },
         relations: ['rooms'],
@@ -228,7 +217,6 @@ export class UserService {
       console.log('Found reservations with relations:', reservations.length);
       console.log('Reservations data:', JSON.stringify(reservations, null, 2));
 
-      // Also check if there are any reservations in the database at all
       const allReservations = await this.reservationRepository.find();
       console.log('Total reservations in database:', allReservations.length);
 
@@ -258,7 +246,6 @@ export class UserService {
     }
   }
 
-  // Get All Users----------------------------------------------------
   public async getAllUsers() {
     try {
       const users = await this.userRepository.find({
@@ -281,7 +268,6 @@ export class UserService {
     }
   }
 
-  // Get User By ID----------------------------------------------------
   public async getUserById(id: number) {
     try {
       const user = await this.userRepository.findOne({
@@ -315,7 +301,6 @@ export class UserService {
     }
   }
 
-  // Update User By ID (Admin)----------------------------------------------------
   public async updateUserById(id: number, updateData: any) {
     try {
       const user = await this.userRepository.findOne({
@@ -326,14 +311,12 @@ export class UserService {
         return { message: 'User not found' };
       }
 
-      // Hash password if provided
       if (updateData.password) {
         updateData.password = await this.hashProvider.hashPassword(
           updateData.password,
         );
       }
 
-      // Check if phone is being changed and if it already exists
       if (updateData.phone && updateData.phone !== user.phone) {
         const existingPhone = await this.userRepository.findOne({
           where: { phone: updateData.phone },
@@ -352,7 +335,6 @@ export class UserService {
     }
   }
 
-  // Delete User----------------------------------------------------
   public async deleteUser(id: number) {
     try {
       const user = await this.userRepository.findOne({

@@ -6,7 +6,6 @@ const App = () => {
   const [activeTab, setActiveTab] = useState('overview');
 
   const handleLogout = () => {
-    // Add logout logic here
     console.log('Logging out...');
   };
 

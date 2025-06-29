@@ -7,7 +7,6 @@ import Image from "next/image";
 import axios from "axios";
 import { FaCalendarAlt } from "react-icons/fa";
 
-// Import auth and booking components
 import GuestRegistrationForm from "@/component/GuestRegistrationForm";
 import { decodeJWT } from "@/app/utilities/jwt-operation";
 import { generateBookingPDFFromResponse } from "@/app/utilities/pdf-generator";
@@ -34,13 +33,11 @@ const SearchResultsPage = () => {
         guests: 1,
     });
 
-    // Booking states
     const [showGuestForm, setShowGuestForm] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
-        // Get search data from URL parameters
         const checkIn = searchParams.get("checkIn") || "";
         const checkOut = searchParams.get("checkOut") || "";
         const guests = parseInt(searchParams.get("guests") || "1");
@@ -58,7 +55,6 @@ const SearchResultsPage = () => {
             }
         }
 
-        // Check authentication status
         checkAuthStatus();
     }, [searchParams]);
 
@@ -76,7 +72,6 @@ const SearchResultsPage = () => {
     };
 
     const handleBookRoom = (room: Room) => {
-        // Validate booking details
         if (!searchCriteria.checkIn || !searchCriteria.checkOut) {
             toast.error(
                 "Please ensure check-in and check-out dates are selected"
@@ -84,13 +79,11 @@ const SearchResultsPage = () => {
             return;
         }
 
-        // Set selected room and show guest form
         setSelectedRoom(room);
         setShowGuestForm(true);
     };
 
     const handleViewDetails = (room: Room) => {
-        // Navigate to accommodation details page using accommodation_id
         router.push(`/accommodation/${room.accommodation_id}`);
     };
 
@@ -123,7 +116,7 @@ const SearchResultsPage = () => {
                 number_of_guests: searchCriteria.guests,
                 payment_status: "pending",
                 typeOfBooking: "online",
-                no_of_rooms: 1, // Default to 1 room for search results
+                no_of_rooms: 1,
                 accommodation_id: selectedRoom.accommodation_id,
                 guest_name: guestData.name,
                 guest_age: guestData.age,
@@ -146,9 +139,7 @@ const SearchResultsPage = () => {
             toast.success("Booking created successfully!");
             console.log("Guest booking response:", response.data);
 
-            // Generate PDF after successful booking
             try {
-                // Create room data object from selected room
                 const roomData = {
                     id: selectedRoom.accommodation_id,
                     title: selectedRoom.room_type,
@@ -176,8 +167,6 @@ const SearchResultsPage = () => {
             setShowGuestForm(false);
             setSelectedRoom(null);
 
-            // Optionally redirect to booking confirmation
-            // router.push("/booking-confirmation");
         } catch (error: any) {
             console.error("Error creating guest booking:", error);
             if (error.response?.data?.message) {
@@ -188,7 +177,6 @@ const SearchResultsPage = () => {
         }
     };
 
-    // Get authenticated user data for pre-filling the guest form
     const getAuthenticatedUserData = () => {
         if (!isAuthenticated) return null;
 
@@ -198,7 +186,6 @@ const SearchResultsPage = () => {
                 return {
                     name: decoded.full_name || "",
                     email: decoded.email || "",
-                    // Add other fields as available from JWT or user API
                 };
             }
         } catch (error) {
@@ -284,7 +271,6 @@ const SearchResultsPage = () => {
                                             fill
                                             className="object-cover"
                                             onError={(e) => {
-                                                // Fallback to a solid color placeholder if image doesn't exist
                                                 const target =
                                                     e.target as HTMLImageElement;
                                                 target.style.display = "none";
@@ -400,7 +386,6 @@ const SearchResultsPage = () => {
                         id: selectedRoom.accommodation_id,
                         title: selectedRoom.room_type || "Standard Room",
                         price: selectedRoom.price_per_night,
-                        // Add other required fields
                     }}
                     bookingDetails={{
                         checkInDate: searchCriteria.checkIn,
@@ -408,7 +393,7 @@ const SearchResultsPage = () => {
                         guests: searchCriteria.guests,
                         rooms: 1,
                     }}
-                    appliedCoupon={null} // No coupon support in search results for now
+                    appliedCoupon={null} 
                     userData={getAuthenticatedUserData()}
                     isAuthenticated={isAuthenticated}
                 />
