@@ -39,8 +39,6 @@ export default function SignUpPage({
 
     const router = useRouter();
 
-    // Test function to check if backend is reachable
-
     const validateField = (name: string, value: string) => {
         const newErrors = { ...errors };
 
@@ -66,11 +64,10 @@ export default function SignUpPage({
                         delete newErrors.email;
                     }
                 } else {
-                    delete newErrors.email; // Email is optional
+                    delete newErrors.email;
                 }
                 break;
             case "phone":
-                // Bangladesh phone number validation: should be 11 digits for local format
                 if (value.length < 11) {
                     newErrors.phone =
                         "Phone number must be at least 11 characters";
@@ -78,9 +75,8 @@ export default function SignUpPage({
                     newErrors.phone =
                         "Phone number must be less than 20 characters";
                 } else {
-                    // Accept various BD formats: 01XXXXXXXXX, +8801XXXXXXXXX, 8801XXXXXXXXX
                     const cleanPhone = value.replace(/\s|-/g, "");
-                    // More flexible regex that accepts different formats
+
                     const bdPhoneRegex = /^(\+?880|0)?1[0-9]\d{8}$/;
                     if (!bdPhoneRegex.test(cleanPhone)) {
                         newErrors.phone =
@@ -121,7 +117,7 @@ export default function SignUpPage({
                         delete newErrors.passport;
                     }
                 } else {
-                    delete newErrors.passport; // Passport is optional
+                    delete newErrors.passport;
                 }
                 break;
             case "nationality":
@@ -169,7 +165,7 @@ export default function SignUpPage({
                         delete newErrors.vehicleNo;
                     }
                 } else {
-                    delete newErrors.vehicleNo; // Vehicle number is optional
+                    delete newErrors.vehicleNo;
                 }
                 break;
             case "age":
@@ -203,7 +199,6 @@ export default function SignUpPage({
             [name]: newValue,
         }));
 
-        // Validate field on change
         if (type !== "checkbox") {
             validateField(name, value);
         }
@@ -212,14 +207,12 @@ export default function SignUpPage({
     const handleOnSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // Additional validation before submission
         const ageValue = parseInt(formData.age);
         if (isNaN(ageValue) || ageValue < 18 || ageValue > 120) {
             toast.error("Please enter a valid age between 18 and 120");
             return;
         }
 
-        // Prepare the data payload
         const userData: any = {
             name: formData.name.trim(),
             password: formData.password,
@@ -233,12 +226,10 @@ export default function SignUpPage({
             fatherName: formData.fatherName.trim(),
         };
 
-        // Only include optional fields if they have valid values
         if (formData.email.trim()) {
             userData.email = formData.email.trim();
         }
 
-        // Include passport and vehicleNo with default values if empty (database constraint)
         userData.passport = formData.passport.trim() || "Not Available";
         userData.vehicleNo = formData.vehicleNo.trim() || "Not Available";
 
@@ -259,7 +250,6 @@ export default function SignUpPage({
             fatherName: typeof userData.fatherName,
         });
 
-        // Use environment variable or fallback to localhost
         const baseURL =
             process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
         const endpoint = `${baseURL}/user/createUser`;
@@ -280,12 +270,10 @@ export default function SignUpPage({
             if (response.status === 201 || response.status === 200) {
                 console.log("Signup successful, calling callbacks...");
 
-                // Show success message first
                 toast.success(
                     "Account created successfully! Welcome email has been sent."
                 );
 
-                // Reset form on success
                 setFormData({
                     name: "",
                     email: "",
@@ -302,22 +290,18 @@ export default function SignUpPage({
                     fatherName: "",
                 });
 
-                // Clear any existing errors
                 setErrors({});
 
-                // Call auth success callback if provided (this should hide signup/signin buttons)
                 if (onAuthSuccess) {
                     console.log("Calling onAuthSuccess callback");
                     setTimeout(() => onAuthSuccess(), 500);
                 }
 
-                // Close modal if onClose prop is provided
                 if (onClose) {
                     console.log("Calling onClose callback");
                     setTimeout(() => onClose(), 1000);
                 }
 
-                // Navigate to signin page or home after a delay
                 setTimeout(() => {
                     if (onSwitchToSignIn) {
                         onSwitchToSignIn();
@@ -342,7 +326,6 @@ export default function SignUpPage({
                 errorMessage =
                     "Cannot connect to server. Please check if the backend is running on http://localhost:3000";
             } else if (err.response) {
-                // Server responded with error status
                 console.log("Server error details:", {
                     status: err.response.status,
                     statusText: err.response.statusText,
@@ -351,10 +334,8 @@ export default function SignUpPage({
                 });
 
                 if (err.response.status === 400) {
-                    // Parse validation errors from backend
                     if (err.response.data?.message) {
                         if (Array.isArray(err.response.data.message)) {
-                            // Multiple validation errors
                             const validationErrors =
                                 err.response.data.message.join(", ");
                             errorMessage = `Validation Error: ${validationErrors}`;
@@ -384,11 +365,9 @@ export default function SignUpPage({
                         `Server error: ${err.response.status}`;
                 }
             } else if (err.request) {
-                // Request was made but no response received
                 errorMessage =
                     "No response from server. Please check your network connection.";
             } else {
-                // Something else happened
                 errorMessage = err.message || "Unknown error occurred";
             }
 

@@ -22,7 +22,6 @@ export default function ComplainPage() {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    // Fetch room items when room number changes
     useEffect(() => {
         if (formData.roomNumber) {
             fetchRoomItems(parseInt(formData.roomNumber));
@@ -61,7 +60,6 @@ export default function ComplainPage() {
             [name]: value,
         }));
 
-        // Clear error when user starts typing
         if (errors[name]) {
             setErrors((prev) => ({
                 ...prev,
@@ -119,7 +117,6 @@ export default function ComplainPage() {
         try {
             setLoading(true);
 
-            // Send complaint to the server
             const response = await axios.post(
                 "http://localhost:3000/complain/report",
                 {
@@ -135,7 +132,6 @@ export default function ComplainPage() {
                 "Complaint submitted successfully! An email has been sent to the hotel management."
             );
 
-            // Reset form
             setFormData({
                 phoneNumber: "",
                 roomNumber: "",

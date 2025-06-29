@@ -18,7 +18,6 @@ const Restaurant = () => {
     const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState("all");
 
-    // Fetch menu items from API
     useEffect(() => {
         const fetchMenuItems = async () => {
             try {
@@ -37,7 +36,6 @@ const Restaurant = () => {
         fetchMenuItems();
     }, []);
 
-    // Group items by category
     const categories = [
         { id: "all", name: "ALL", color: "bg-orange-500" },
         { id: "breakfast", name: "BREAKFAST", color: "bg-orange-500" },
@@ -59,7 +57,6 @@ const Restaurant = () => {
     };
 
     const getImageForFoodType = (foodType: string, itemName: string) => {
-        // Map food types to appropriate images
         const imageMap: { [key: string]: string } = {
             breakfast: "/images/rooms/room1.jpg",
             lunch: "/images/rooms/room2.jpg",

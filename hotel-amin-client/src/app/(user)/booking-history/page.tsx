@@ -124,7 +124,6 @@ export default function BookingHistoryPage() {
             const token = JSON.parse(tokenString);
             const reviews: { [key: number]: BookingReview } = {};
 
-            // Fetch existing reviews for each booking
             for (const booking of bookingHistory) {
                 try {
                     const response = await fetch(
@@ -143,7 +142,6 @@ export default function BookingHistoryPage() {
                         reviews[booking.booking_id] = reviewData;
                     }
                 } catch (error) {
-                    // Review doesn't exist for this booking, which is fine
                     console.log(
                         `No review found for booking ${booking.booking_id}`
                     );
@@ -209,7 +207,6 @@ export default function BookingHistoryPage() {
             [bookingId]: !prev[bookingId],
         }));
 
-        // Initialize review data if not exists
         if (!reviewData[bookingId]) {
             setReviewData((prev) => ({
                 ...prev,
@@ -241,7 +238,6 @@ export default function BookingHistoryPage() {
 
             setSubmittingReview((prev) => ({ ...prev, [bookingId]: true }));
 
-            // Get user ID from token (assuming it's stored in the token)
             const tokenData = JSON.parse(atob(token.split(".")[1]));
             const userId = tokenData.sub;
 

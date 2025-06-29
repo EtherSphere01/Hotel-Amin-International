@@ -56,7 +56,6 @@ const App = () => {
     const [offers, setOffers] = useState<any[]>([]);
     const [bookings, setBookings] = useState<any[]>([]);
 
-    // Loading states
     const [loading, setLoading] = useState({
         users: false,
         rooms: false,
@@ -95,7 +94,6 @@ const App = () => {
             const roomsData = data.data || data;
             setRooms(roomsData);
 
-            // Update room stats
             const available = roomsData.filter(
                 (room: any) => room.room_status === "available"
             ).length;
@@ -144,7 +142,6 @@ const App = () => {
             const data = await response.json();
             setCoupons(data);
 
-            // Update coupon stats
             const active = data.filter(
                 (coupon: any) => coupon.is_active
             ).length;
@@ -196,7 +193,6 @@ const App = () => {
             const bookingsData = data.data || data;
             setBookings(bookingsData);
 
-            // Check for new bookings for notifications
             if (
                 previousBookingCount > 0 &&
                 bookingsData.length > previousBookingCount
@@ -212,7 +208,6 @@ const App = () => {
             }
             setPreviousBookingCount(bookingsData.length);
 
-            // Calculate revenue (simplified - today's bookings total)
             const today = new Date().toISOString().split("T")[0];
             const todayBookings = bookingsData.filter(
                 (booking: any) =>
@@ -232,14 +227,13 @@ const App = () => {
                 ...prev,
                 bookings: "Failed to load bookings",
             }));
-            // Fallback to empty array if API fails
+
             setBookings([]);
         } finally {
             setLoading((prev) => ({ ...prev, bookings: false }));
         }
     };
 
-    // Notification functions
     const addNotification = (type: string, message: string, count: number) => {
         const newNotification = {
             id: Date.now(),
@@ -262,7 +256,6 @@ const App = () => {
         setNotifications([]);
     };
 
-    // Check for new bookings and reservations
     const checkForNewBookings = async () => {
         try {
             const response = await fetch(`${API_BASE_URL}/booking/all`);
@@ -318,7 +311,6 @@ const App = () => {
         }
     };
 
-    // Load data on component mount
     useEffect(() => {
         fetchUsers();
         fetchRooms();
@@ -327,11 +319,9 @@ const App = () => {
         fetchOffers();
         fetchBookings();
 
-        // Initialize counts for notifications
         checkForNewBookings();
         checkForNewReservations();
 
-        // Set up interval to check for new bookings/reservations every 30 seconds
         const notificationInterval = setInterval(() => {
             checkForNewBookings();
             checkForNewReservations();
@@ -340,7 +330,6 @@ const App = () => {
         return () => clearInterval(notificationInterval);
     }, []);
 
-    // Handle click outside notification dropdown
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             const target = event.target as HTMLElement;
@@ -358,7 +347,6 @@ const App = () => {
         };
     }, [notificationOpen]);
 
-    // Refresh all data
     const refreshAllData = () => {
         fetchUsers();
         fetchRooms();
@@ -368,30 +356,24 @@ const App = () => {
         fetchBookings();
     };
 
-    // Edit and Delete functions
     const handleEdit = (
         type: "user" | "room" | "food" | "coupon" | "offer",
         item: any
     ) => {
-        // For display items, we need to find the original API data
         let originalItem = item;
 
         if (type === "room") {
-            // Find original room data from rooms array (not displayRooms)
             originalItem =
                 rooms.find((room) => room.room_num === item.room_num) || item;
         } else if (type === "food") {
-            // Find original food data from food array (not displayFood)
             originalItem =
                 food.find((foodItem) => foodItem.food_id === item.food_id) ||
                 item;
         } else if (type === "coupon") {
-            // Find original coupon data from coupons array (not displayCoupons)
             originalItem =
                 coupons.find((coupon) => coupon.coupon_id === item.coupon_id) ||
                 item;
         } else if (type === "offer") {
-            // Find original offer data from offers array
             originalItem = offers.find((offer) => offer.id === item.id) || item;
         }
 
@@ -433,7 +415,6 @@ const App = () => {
                     endpoint = `/coupon/delete/${id}`;
                     break;
                 case "offer":
-                    // Since offers don't have a backend API yet, we'll handle them locally
                     console.log("Offer delete not implemented yet");
                     toast.success("Offer deleted successfully!");
                     return;
@@ -450,7 +431,6 @@ const App = () => {
                 );
             }
 
-            // Refresh the specific data
             switch (type) {
                 case "user":
                     fetchUsers();
@@ -506,7 +486,6 @@ const App = () => {
                     endpoint = `/coupon/update/${editingItem.coupon_id}`;
                     break;
                 case "offer":
-                    // Offers are handled locally for now
                     console.log("Offer edit not implemented yet");
                     setEditModalOpen(false);
                     setEditingItem(null);
@@ -530,7 +509,6 @@ const App = () => {
                 );
             }
 
-            // Refresh the specific data
             switch (editModalType) {
                 case "user":
                     fetchUsers();
@@ -569,7 +547,6 @@ const App = () => {
         }
     };
 
-    // Add functions
     const handleAdd = (type: "user" | "room" | "food" | "coupon" | "offer") => {
         setAddModalType(type);
         setAddModalOpen(true);
@@ -595,7 +572,6 @@ const App = () => {
                     endpoint = "/coupon/create";
                     break;
                 case "offer":
-                    // Offers are handled locally for now
                     console.log("Offer creation not implemented yet");
                     setAddModalOpen(false);
                     setAddModalType(null);
@@ -618,7 +594,6 @@ const App = () => {
                 );
             }
 
-            // Refresh the specific data
             switch (addModalType) {
                 case "user":
                     fetchUsers();
@@ -655,9 +630,8 @@ const App = () => {
         }
     };
 
-    // Transform API data for display
     const transformRoomData = (apiRoom: any) => ({
-        ...apiRoom, // Preserve original API fields
+        ...apiRoom,
         id: apiRoom.room_num,
         number: apiRoom.room_num.toString(),
         type: apiRoom.type || "standard",
@@ -667,7 +641,7 @@ const App = () => {
     });
 
     const transformFoodData = (apiFood: any) => ({
-        ...apiFood, // Preserve original API fields
+        ...apiFood,
         id: apiFood.food_id,
         name: apiFood.item_name,
         category: apiFood.food_type,
@@ -677,7 +651,7 @@ const App = () => {
     });
 
     const transformCouponData = (apiCoupon: any) => ({
-        ...apiCoupon, // Preserve original API fields
+        ...apiCoupon,
         id: apiCoupon.coupon_id,
         code: apiCoupon.coupon_code,
         discount: apiCoupon.coupon_percent,
@@ -690,11 +664,10 @@ const App = () => {
             ? new Date(apiCoupon.expire_at).toLocaleDateString()
             : "N/A",
         status: apiCoupon.is_active ? "active" : "expired",
-        usageCount: 0, // Not available in current API
+        usageCount: 0,
         maxUsage: apiCoupon.quantity || 100,
     });
 
-    // Transformed data for rendering
     const displayRooms = rooms.map(transformRoomData);
     const displayFood = food.map(transformFoodData);
     const displayCoupons = coupons.map(transformCouponData);
@@ -709,7 +682,6 @@ const App = () => {
             const offersData = data.data || data;
             setOffers(offersData);
 
-            // Update offers stats
             const activeOffers = offersData.filter(
                 (offer: any) => offer.status === "active"
             ).length;
@@ -782,7 +754,6 @@ const App = () => {
         },
     ];
 
-    // Filtered data based on search terms
     const filteredUsers = users.filter(
         (user) =>
             user.name
@@ -851,7 +822,6 @@ const App = () => {
                 .includes(searchTerms.offers.toLowerCase())
     );
 
-    // Edit Modal Component
     const EditModal = () => {
         const [formData, setFormData] = useState<any>(editingItem || {});
 
@@ -873,12 +843,9 @@ const App = () => {
         };
 
         const getFilteredFormData = () => {
-            // Filter formData to only include fields that should be sent to the API
             const filteredData = { ...formData };
 
-            // Remove any display-only or computed fields and ID fields (passed as URL params)
             if (editModalType === "room") {
-                // UpdateRoomDto fields only - exclude room_num (it's in URL param)
                 const allowedFields = [
                     "floor",
                     "capacity",
@@ -895,7 +862,6 @@ const App = () => {
                     }
                 });
             } else if (editModalType === "food") {
-                // CreateMenuItemDto fields - exclude food_id (it's in URL param)
                 const allowedFields = [
                     "item_name",
                     "item_price",
@@ -908,13 +874,11 @@ const App = () => {
                         delete filteredData[key];
                     }
                 });
-                // Set availability to true if not set
+
                 if (filteredData.availability === undefined) {
                     filteredData.availability = true;
                 }
             } else if (editModalType === "coupon") {
-                // CreateCouponDto fields - exclude coupon_id (it's in URL param)
-                // Note: CreateCouponDto requires employee_id and expire_at
                 const allowedFields = [
                     "coupon_code",
                     "coupon_percent",
@@ -926,14 +890,12 @@ const App = () => {
                         delete filteredData[key];
                     }
                 });
-                // Add missing required fields for coupon DTO
-                filteredData.employee_id = 1; // Default employee ID - should be from logged in user
-                // Convert expire_at to proper date format if it exists
+
+                filteredData.employee_id = 1;
                 if (filteredData.expire_at) {
                     filteredData.expire_at = new Date(filteredData.expire_at);
                 }
             } else if (editModalType === "user") {
-                // UpdateUserAdminDto fields - exclude user_id (it's in URL param)
                 const allowedFields = [
                     "name",
                     "email",
@@ -1636,7 +1598,6 @@ const App = () => {
         );
     };
 
-    // Add Modal Component
     const AddModal = () => {
         const [formData, setFormData] = useState<any>({});
 
@@ -2508,7 +2469,7 @@ const App = () => {
                                         | "coupons"
                                         | "offers"
                                 );
-                                setSidebarOpen(false); // Close sidebar on mobile after selection
+                                setSidebarOpen(false);
                             }}
                             className={`w-full flex items-center space-x-3 p-3 rounded-xl font-medium text-sm transition-all duration-200 ${
                                 activeTab === key

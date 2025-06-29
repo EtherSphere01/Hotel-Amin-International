@@ -133,7 +133,6 @@ export default function RoomCategoriesPage() {
             toast.success("Booking created successfully!");
             console.log("Guest booking response:", response.data);
 
-            // Generate PDF after successful booking
             try {
                 generateBookingPDFFromResponse(
                     response,
@@ -156,7 +155,6 @@ export default function RoomCategoriesPage() {
             setShowGuestForm(false);
             setSelectedRoom(null);
 
-            // Optionally redirect to booking confirmation
             router.push("/booking");
         } catch (error: any) {
             console.error("Error creating guest booking:", error);

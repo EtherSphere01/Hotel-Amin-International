@@ -18,7 +18,6 @@ const Restaurant = () => {
     const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState("all");
 
-    // Fetch menu items from API
     useEffect(() => {
         const fetchMenuItems = async () => {
             try {
@@ -37,11 +36,10 @@ const Restaurant = () => {
         fetchMenuItems();
     }, []);
 
-    // Group items by category - consolidate lunch and dinner into "DISHES"
     const categories = [
         { id: "all", name: "ALL", color: "bg-orange-500" },
         { id: "breakfast", name: "BREAKFAST", color: "bg-orange-500" },
-        { id: "dishes", name: "DISHES", color: "bg-orange-500" }, // Combined lunch & dinner
+        { id: "dishes", name: "DISHES", color: "bg-orange-500" },
         { id: "snack", name: "SNACKS", color: "bg-orange-500" },
         { id: "beverage", name: "DRINKS & JUICE", color: "bg-orange-500" },
         { id: "dessert", name: "DESSERTS", color: "bg-orange-500" },

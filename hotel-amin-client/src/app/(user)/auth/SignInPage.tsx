@@ -84,12 +84,10 @@ export default function SignInPage({
                         // };
                         setUser(user);
 
-                        // Close modal if onClose prop is provided
                         if (onClose) {
                             onClose();
                         }
 
-                        // Call auth success callback
                         if (onAuthSuccess) {
                             onAuthSuccess();
                         }

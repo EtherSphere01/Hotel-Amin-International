@@ -26,7 +26,6 @@ import {
 } from "@/app/utilities/cart-utils";
 import { generateBookingPDFFromResponse } from "@/app/utilities/pdf-generator";
 
-// Import auth components
 import SignInPage from "@/app/(user)/auth/SignInPage";
 import GuestRegistrationForm from "@/component/GuestRegistrationForm";
 import { decodeJWT, getToken } from "@/app/utilities/jwt-operation";
@@ -64,13 +63,11 @@ export default function RoomDetailsPage() {
     const [showGuestForm, setShowGuestForm] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    // Booking form states
     const [checkInDate, setCheckInDate] = useState("");
     const [checkOutDate, setCheckOutDate] = useState("");
     const [guests, setGuests] = useState(1);
     const [rooms, setRooms] = useState(1);
 
-    // Coupon states
     const [couponCode, setCouponCode] = useState("");
     const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
     const [couponDiscount, setCouponDiscount] = useState(0);
@@ -95,7 +92,6 @@ export default function RoomDetailsPage() {
             fetchRoomData();
         }
 
-        // Check authentication status
         checkAuthStatus();
     }, [roomId]);
 
@@ -105,7 +101,6 @@ export default function RoomDetailsPage() {
 
         if (token) {
             try {
-                // Properly decode and validate JWT token
                 const decoded = decodeJWT();
                 console.log("Decoded token:", decoded);
 
@@ -113,7 +108,6 @@ export default function RoomDetailsPage() {
                     setIsAuthenticated(true);
                     console.log("User authenticated successfully");
                 } else {
-                    // Token is invalid or expired
                     console.log("Token invalid or expired");
                     setIsAuthenticated(false);
                     localStorage.removeItem("accessToken");
@@ -159,11 +153,9 @@ export default function RoomDetailsPage() {
             return;
         }
 
-        // Always show guest form regardless of authentication status
         setShowGuestForm(true);
     };
 
-    // Get authenticated user data for pre-filling the guest form
     const getAuthenticatedUserData = () => {
         if (!isAuthenticated) return null;
 
@@ -173,7 +165,6 @@ export default function RoomDetailsPage() {
                 return {
                     name: decoded.full_name || "",
                     email: decoded.email || "",
-                    // Add other fields as available from JWT or user API
                 };
             }
         } catch (error) {
@@ -228,7 +219,6 @@ export default function RoomDetailsPage() {
             toast.success("Guest booking created successfully!");
             console.log("Guest booking response:", response.data);
 
-            // Generate PDF after successful booking
             try {
                 generateBookingPDFFromResponse(
                     response,
@@ -249,7 +239,6 @@ export default function RoomDetailsPage() {
             }
 
             setShowGuestForm(false);
-            // router.push("/booking-confirmation"); // Redirect to confirmation page
         } catch (error: any) {
             console.error("Error creating guest booking:", error);
             if (error.response?.data?.message) {
@@ -274,7 +263,6 @@ export default function RoomDetailsPage() {
 
             const coupon = response.data;
 
-            // Validate coupon
             if (!coupon.is_active) {
                 toast.error("This coupon is no longer active");
                 return;
@@ -290,7 +278,6 @@ export default function RoomDetailsPage() {
                 return;
             }
 
-            // Apply coupon
             setAppliedCoupon(coupon);
             setCouponDiscount(coupon.coupon_percent);
             toast.success(`Coupon applied! ${coupon.coupon_percent}% discount`);

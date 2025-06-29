@@ -58,7 +58,6 @@ export default function ProfilePage() {
                 return;
             }
 
-            // Parse the token since it's stored as JSON string
             const token = JSON.parse(tokenString);
 
             const response = await fetch("http://localhost:3000/user/profile", {
@@ -111,10 +110,8 @@ export default function ProfilePage() {
                 return;
             }
 
-            // Parse the token since it's stored as JSON string
             const token = JSON.parse(tokenString);
 
-            // Prepare update data
             const updateData = {
                 name: editData.name,
                 email: editData.email,

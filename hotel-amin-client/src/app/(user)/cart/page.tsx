@@ -35,7 +35,6 @@ export default function CartPage() {
 
         if (token) {
             try {
-                // Properly decode and validate JWT token
                 const decoded = decodeJWT();
                 console.log("Decoded token:", decoded);
 
@@ -43,7 +42,6 @@ export default function CartPage() {
                     setIsAuthenticated(true);
                     console.log("User authenticated successfully");
                 } else {
-                    // Token is invalid or expired
                     console.log("Token invalid or expired");
                     setIsAuthenticated(false);
                     localStorage.removeItem("accessToken");
@@ -61,7 +59,6 @@ export default function CartPage() {
         }
     };
 
-    // Get authenticated user data for pre-filling the guest form
     const getAuthenticatedUserData = () => {
         if (!isAuthenticated) return null;
 
@@ -71,7 +68,6 @@ export default function CartPage() {
                 return {
                     name: decoded.full_name || "",
                     email: decoded.email || "",
-                    // Add other fields as available from JWT or user API
                 };
             }
         } catch (error) {
@@ -94,7 +90,6 @@ export default function CartPage() {
 
     const updateCart = (newCartItems: CartItem[]) => {
         setCartItems(newCartItems);
-        // The cart utilities will handle localStorage and event dispatch
     };
 
     const removeFromCart = (itemId: number) => {
@@ -157,7 +152,6 @@ export default function CartPage() {
             return;
         }
 
-        // Validate that all cart items have required booking details
         const hasIncompleteItems = cartItems.some(
             (item) => !item.checkInDate || !item.checkOutDate
         );
@@ -169,7 +163,6 @@ export default function CartPage() {
             return;
         }
 
-        // Always show guest form regardless of authentication status
         setShowGuestForm(true);
     };
 
@@ -180,7 +173,6 @@ export default function CartPage() {
         }
 
         try {
-            // Process each cart item as a separate booking
             for (const item of cartItems) {
                 const bookingData = {
                     checkin_date: new Date(item.checkInDate!),
@@ -213,7 +205,6 @@ export default function CartPage() {
                     response.data
                 );
 
-                // Generate PDF for each booking
                 try {
                     const roomData = {
                         id: item.id,
@@ -238,15 +229,13 @@ export default function CartPage() {
                         `Error generating PDF for ${item.title}:`,
                         pdfError
                     );
-                    // Don't break the loop, just log the error
                 }
             }
 
             toast.success("All bookings created successfully!");
             toast.success("Booking confirmation PDFs have been downloaded!");
             setShowGuestForm(false);
-            clearCart(); // Clear cart after successful booking
-            // router.push("/booking-confirmation"); // Redirect to confirmation page
+            clearCart();
         } catch (error: any) {
             console.error("Error creating bookings:", error);
             if (error.response?.data?.message) {

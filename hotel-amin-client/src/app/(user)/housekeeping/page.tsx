@@ -90,7 +90,6 @@ const HousekeepingPage = () => {
                     "Housekeeping request submitted successfully! We will contact you soon."
                 );
 
-                // Reset form
                 setFormData({
                     room: "",
                     phone: "",
