@@ -60,6 +60,36 @@ const offersByDate: Record<
             ],
         },
     ],
+    "2025-06-29": [
+        {
+            category: "Rooms",
+            data: [
+                {
+                    title: "20% Off Executive Suites",
+                    image: "/assets/room2.jpg",
+                    rating: 4.95,
+                    reviews: 256,
+                    description:
+                        "Relax in our premium executive suites at a discounted rate.",
+                },
+            ],
+        },
+    ],
+    "2025-07-03": [
+        {
+            category: "Rooms",
+            data: [
+                {
+                    title: "20% Off Executive Suites",
+                    image: "/assets/room2.jpg",
+                    rating: 4.95,
+                    reviews: 256,
+                    description:
+                        "Relax in our premium executive suites at a discounted rate.",
+                },
+            ],
+        },
+    ],
 };
 
 type OfferItem = {
