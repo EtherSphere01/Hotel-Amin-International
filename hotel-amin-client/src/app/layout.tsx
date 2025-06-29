@@ -35,7 +35,6 @@ export default function RootLayout({
                     pauseOnHover
                 />
 
-                {/* Tawk.to Live Chat Widget */}
                 <Script
                     id="tawk-to-script"
                     strategy="afterInteractive"

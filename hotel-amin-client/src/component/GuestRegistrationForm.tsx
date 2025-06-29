@@ -154,7 +154,6 @@ export default function GuestRegistrationForm({
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                    {/* Row 1: Name, Age, Father's Name */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -223,7 +222,6 @@ export default function GuestRegistrationForm({
                         </div>
                     </div>
 
-                    {/* Row 2: Home Address */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Home Address:{" "}
@@ -246,7 +244,6 @@ export default function GuestRegistrationForm({
                         )}
                     </div>
 
-                    {/* Row 3: Relation, Mobile No. */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -285,7 +282,6 @@ export default function GuestRegistrationForm({
                         </div>
                     </div>
 
-                    {/* Row 4: Nationality, Profession */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -332,7 +328,6 @@ export default function GuestRegistrationForm({
                         </div>
                     </div>
 
-                    {/* Row 5: Passport No./NID */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Passport No./NID:{" "}
@@ -355,7 +350,6 @@ export default function GuestRegistrationForm({
                         )}
                     </div>
 
-                    {/* Row 6: Guest Type */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Guest Type: <span className="text-red-500">*</span>
@@ -397,7 +391,6 @@ export default function GuestRegistrationForm({
                         </div>
                     </div>
 
-                    {/* Row 7: Vehicle No. */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Vehicle No.:
@@ -412,7 +405,6 @@ export default function GuestRegistrationForm({
                         />
                     </div>
 
-                    {/* Booking Summary */}
                     <div className="bg-gray-50 p-4 rounded-lg">
                         <h4 className="font-semibold text-gray-800 mb-2">
                             Booking Summary
@@ -458,7 +450,6 @@ export default function GuestRegistrationForm({
                         </div>
                     </div>
 
-                    {/* Submit Button */}
                     <div className="flex gap-3 pt-4">
                         <button
                             type="button"

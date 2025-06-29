@@ -24,7 +24,6 @@ export class UserService {
     private readonly emailService: EmailService,
   ) {}
 
-  // Create User----------------------------------------------------
   public async createUser(createUserDto: CreateUserDto) {
     const existingUser = await this.userRepository.findOne({
       where: { phone: createUserDto.phone },
@@ -51,7 +50,6 @@ export class UserService {
     }
   }
 
-  // Update User----------------------------------------------------
   public async updateUser(updateUserDto: UpdateUserDto) {
     const user = await this.userRepository.findOne({
       where: { phone: updateUserDto.previousPhone },

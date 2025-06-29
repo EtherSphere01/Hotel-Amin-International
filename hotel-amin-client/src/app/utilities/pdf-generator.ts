@@ -20,10 +20,8 @@ interface BookingData {
 export const generateBookingPDF = (bookingData: BookingData): void => {
     const doc = new jsPDF();
 
-    // Set font
     doc.setFont("helvetica");
 
-    // Header
     doc.setFontSize(20);
     doc.setTextColor(0, 0, 0);
     doc.text("HOTEL AMIN INTERNATIONAL", 105, 20, { align: "center" });
@@ -34,24 +32,20 @@ export const generateBookingPDF = (bookingData: BookingData): void => {
     });
     doc.text("Hotline: 01886966602", 105, 40, { align: "center" });
 
-    // Title
     doc.setFontSize(16);
     doc.setTextColor(0, 0, 255);
     doc.text("BOOKING CONFIRMATION", 105, 60, { align: "center" });
 
-    // Booking ID
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
     if (bookingData.id) {
         doc.text(`Booking ID: ${bookingData.id}`, 20, 80);
     }
 
-    // Booking Date
     const bookingDate =
         bookingData.booking_date || new Date().toLocaleDateString();
     doc.text(`Booking Date: ${bookingDate}`, 20, 90);
 
-    // Guest Information
     doc.setFontSize(14);
     doc.setTextColor(0, 0, 255);
     doc.text("GUEST INFORMATION", 20, 110);
@@ -64,7 +58,6 @@ export const generateBookingPDF = (bookingData: BookingData): void => {
         doc.text(`Email: ${bookingData.guest_email}`, 20, 145);
     }
 
-    // Booking Details
     doc.setFontSize(14);
     doc.setTextColor(0, 0, 255);
     doc.text("BOOKING DETAILS", 20, 165);
@@ -89,7 +82,6 @@ export const generateBookingPDF = (bookingData: BookingData): void => {
     doc.text(`Number of Guests: ${bookingData.number_of_guests}`, 20, 210);
     doc.text(`Number of Rooms: ${bookingData.no_of_rooms}`, 20, 220);
 
-    // Calculate nights
     const checkIn = new Date(bookingData.checkin_date);
     const checkOut = new Date(bookingData.checkout_date);
     const nights = Math.ceil(
@@ -97,7 +89,6 @@ export const generateBookingPDF = (bookingData: BookingData): void => {
     );
     doc.text(`Number of Nights: ${nights}`, 20, 230);
 
-    // Payment Information
     doc.setFontSize(14);
     doc.setTextColor(0, 0, 255);
     doc.text("PAYMENT INFORMATION", 20, 250);
@@ -151,7 +142,6 @@ export const generateBookingPDF = (bookingData: BookingData): void => {
         );
     }
 
-    // Footer
     doc.setFontSize(10);
     doc.setTextColor(128, 128, 128);
     doc.text("Thank you for choosing Hotel Amin International!", 105, 320, {
@@ -161,12 +151,10 @@ export const generateBookingPDF = (bookingData: BookingData): void => {
         align: "center",
     });
 
-    // Generate filename with booking ID and date
     const filename = `booking-confirmation-${bookingData.id || "draft"}-${
         new Date().toISOString().split("T")[0]
     }.pdf`;
 
-    // Save the PDF
     doc.save(filename);
 };
 
@@ -183,7 +171,6 @@ export const generateBookingPDFFromResponse = (
     );
     const subtotal = roomData.price * nights * bookingDetails.rooms;
 
-    // Calculate discount if coupon is applied
     let discount = 0;
     if (bookingDetails.appliedCoupon) {
         discount = Math.round(

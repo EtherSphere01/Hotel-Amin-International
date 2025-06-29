@@ -18,7 +18,6 @@ import {
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 
-// API Base URL
 const API_BASE_URL = "http://localhost:3000";
 
 const App = () => {
@@ -27,7 +26,6 @@ const App = () => {
     >("users");
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    // Modal states
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [editModalType, setEditModalType] = useState<
         "user" | "room" | "food" | "coupon" | "offer" | null
@@ -38,13 +36,11 @@ const App = () => {
         "user" | "room" | "food" | "coupon" | "offer" | null
     >(null);
 
-    // Notification states
     const [notifications, setNotifications] = useState<any[]>([]);
     const [notificationOpen, setNotificationOpen] = useState(false);
     const [previousBookingCount, setPreviousBookingCount] = useState(0);
     const [previousReservationCount, setPreviousReservationCount] = useState(0);
 
-    // Search states
     const [searchTerms, setSearchTerms] = useState({
         users: "",
         rooms: "",
@@ -53,7 +49,6 @@ const App = () => {
         offers: "",
     });
 
-    // Data states
     const [users, setUsers] = useState<any[]>([]);
     const [rooms, setRooms] = useState<any[]>([]);
     const [food, setFood] = useState<any[]>([]);
@@ -71,7 +66,6 @@ const App = () => {
         bookings: false,
     });
 
-    // Error states
     const [errors, setErrors] = useState({
         users: null as string | null,
         rooms: null as string | null,
@@ -81,7 +75,6 @@ const App = () => {
         bookings: null as string | null,
     });
 
-    // Stats
     const [stats, setStats] = useState({
         availableRooms: 0,
         occupiedRooms: 0,
@@ -92,7 +85,6 @@ const App = () => {
         todayRevenue: 0,
     });
 
-    // Fetch data functions
     const fetchRooms = async () => {
         setLoading((prev) => ({ ...prev, rooms: true }));
         try {
@@ -100,7 +92,6 @@ const App = () => {
             if (!response.ok) throw new Error("Failed to fetch rooms");
             const data = await response.json();
 
-            // Handle paginated response
             const roomsData = data.data || data;
             setRooms(roomsData);
 

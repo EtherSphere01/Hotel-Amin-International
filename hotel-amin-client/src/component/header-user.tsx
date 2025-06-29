@@ -170,7 +170,6 @@ const HeaderUser = () => {
     return (
         <header className="bg-[#0C1F34] text-white w-full">
             <div className="flex flex-col md:flex-row items-center md:items-stretch">
-                {/* Logo + Divider */}
                 <div className="flex md:items-center px-4 relative h-12 md:h-auto w-full md:w-auto justify-between">
                     <Image
                         src="/images/logo.png"
@@ -180,9 +179,7 @@ const HeaderUser = () => {
                         className=" h-16 md:h-20 w-auto object-contain"
                     />
 
-                    {/* Mobile Right Section */}
                     <div className="md:hidden flex items-center gap-3">
-                        {/* Mobile Cart Icon */}
                         <Link href="/cart" className="relative">
                             <FaShoppingCart className="text-white text-lg cursor-pointer hover:text-yellow-400 transition" />
                             {cartItemCount > 0 && (
@@ -218,7 +215,6 @@ const HeaderUser = () => {
                                     Sign In
                                 </button>
 
-                                {/* Hidden Sign Up button - keeping functionality */}
                                 <button
                                     onClick={() =>
                                         handleSignUpButton(!signupButton)
@@ -230,7 +226,6 @@ const HeaderUser = () => {
                             </>
                         )}
 
-                        {/* Language Dropdown */}
                         <div className="flex items-center gap-2 bg-gray-200 text-black text-sm px-3 py-1 rounded">
                             <IoGlobeOutline className="text-base" />
                             <select className="bg-transparent focus:outline-none">
@@ -240,7 +235,6 @@ const HeaderUser = () => {
                             </select>
                         </div>
 
-                        {/* Mobile Menu Button */}
                         <button
                             onClick={() => setMenuOpen(!menuOpen)}
                             className="text-white text-2xl focus:outline-none"
@@ -249,22 +243,16 @@ const HeaderUser = () => {
                         </button>
                     </div>
 
-                    {/* Divider */}
                     <div className="hidden md:block absolute right-0 top-1/2 transform -translate-y-1/2 h-[80%] w-px bg-[#1A2B3D]" />
                 </div>
 
-                {/* Right Section */}
                 <div className="flex-1 mx-5 w-full flex flex-col">
-                    {/* Top Row */}
                     <div className="flex flex-wrap items-center justify-between px-4 sm:px-6 pt-4 pb-3">
-                        {/* Title - only on desktop */}
                         <h1 className="hidden md:block text-yellow-400 text-lg font-bold text-center md:text-left w-full md:w-auto mb-2 md:mb-0">
                             HOTEL AMIN INTERNATIONAL
                         </h1>
 
-                        {/* Desktop buttons */}
                         <div className="hidden md:flex flex-wrap gap-2 sm:gap-3 items-center justify-center md:justify-end w-full md:w-auto">
-                            {/* Cart Icon with Badge */}
                             <Link href="/cart" className="relative">
                                 <FaShoppingCart className="text-white text-lg cursor-pointer hover:text-yellow-400 transition" />
                                 {cartItemCount > 0 && (
@@ -303,7 +291,6 @@ const HeaderUser = () => {
                                         Sign In
                                     </button>
 
-                                    {/* Hidden Sign Up button - keeping functionality */}
                                     <button
                                         onClick={() =>
                                             handleSignUpButton(!signupButton)
@@ -315,7 +302,6 @@ const HeaderUser = () => {
                                 </>
                             )}
 
-                            {/* Language Dropdown */}
                             <div className="flex items-center gap-2 bg-gray-200 text-black text-sm px-3 py-1 rounded">
                                 <IoGlobeOutline className="text-base" />
                                 <select className="bg-transparent focus:outline-none">
@@ -327,7 +313,6 @@ const HeaderUser = () => {
                         </div>
                     </div>
 
-                    {/* Nav Row - Desktop */}
                     <nav className="hidden md:flex flex-wrap justify-start gap-4 md:gap-15 px-4 sm:px-6 pb-4 pt-2 text-sm font-medium">
                         {navLinks
                             .filter((link) => link.name !== "Contact Us")
@@ -345,7 +330,6 @@ const HeaderUser = () => {
                                 </Link>
                             ))}
 
-                        {/* Services Dropdown */}
                         <div ref={servicesDropdownRef} className="relative">
                             <button
                                 onClick={() =>
@@ -391,7 +375,6 @@ const HeaderUser = () => {
                             )}
                         </div>
 
-                        {/* Contact Us at the end */}
                         <Link
                             href="/contact"
                             className={`cursor-pointer ${
@@ -404,13 +387,11 @@ const HeaderUser = () => {
                         </Link>
                     </nav>
 
-                    {/* Mobile Menu */}
                     {menuOpen && (
                         <div
                             ref={menuRef}
                             className="flex flex-col items-center md:hidden gap-4 px-4 pb-4 pt-2 text-sm font-medium border-t border-gray-600"
                         >
-                            {/* Nav Links */}
                             {navLinks
                                 .filter((link) => link.name !== "Contact Us")
                                 .map((link) => (
@@ -428,7 +409,6 @@ const HeaderUser = () => {
                                     </Link>
                                 ))}
 
-                            {/* Services Links in Mobile */}
                             {serviceLinks.map((link) => (
                                 <Link
                                     key={link.href}
@@ -444,7 +424,6 @@ const HeaderUser = () => {
                                 </Link>
                             ))}
 
-                            {/* Contact Us at the end */}
                             <Link
                                 href="/contact"
                                 onClick={() => setMenuOpen(false)}
@@ -457,7 +436,6 @@ const HeaderUser = () => {
                                 Contact Us
                             </Link>
 
-                            {/* Cart */}
                             <Link href="/cart" className="relative">
                                 <FaShoppingCart className="text-white text-lg cursor-pointer hover:text-yellow-400 transition" />
                                 {cartItemCount > 0 && (
@@ -473,14 +451,12 @@ const HeaderUser = () => {
                 </div>
             </div>
 
-            {/* Sign In Modal */}
             {signinButton && (
                 <div className="fixed inset-0 bg-[#00000065] bg-opacity-50 flex items-center justify-center z-50">
                     <div
                         ref={modalRef}
                         className="relative bg-white rounded-lg shadow-lg max-w-md w-full mx-4"
                     >
-                        {/* Cancel Button */}
                         <button
                             onClick={() => setSignInButton(false)}
                             className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold"
@@ -488,7 +464,6 @@ const HeaderUser = () => {
                             <FaTimes />
                         </button>
 
-                        {/* Sign In Page Content */}
                         <div className="p-6">
                             <SignInPage
                                 onClose={() => setSignInButton(false)}
@@ -503,14 +478,12 @@ const HeaderUser = () => {
                 </div>
             )}
 
-            {/* Sign Up Modal */}
             {signupButton && (
                 <div className="fixed inset-0 bg-[#00000065] bg-opacity-50 flex items-center justify-center z-50">
                     <div
                         ref={modalRef}
                         className="relative bg-white rounded-lg shadow-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden"
                     >
-                        {/* Cancel Button */}
                         <button
                             onClick={() => setSignUpButton(false)}
                             className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold z-10"
@@ -518,7 +491,6 @@ const HeaderUser = () => {
                             <FaTimes />
                         </button>
 
-                        {/* Sign Up Page Content */}
                         <div className="p-6">
                             <SignUpPage
                                 onClose={() => setSignUpButton(false)}
@@ -533,7 +505,6 @@ const HeaderUser = () => {
                 </div>
             )}
 
-            {/* Debug Info - Remove in production */}
             {process.env.NODE_ENV === "development" && (
                 <div className="fixed bottom-4 left-4 bg-black text-white p-2 text-xs z-50">
                     SignIn: {signinButton ? "true" : "false"} | SignUp:{" "}

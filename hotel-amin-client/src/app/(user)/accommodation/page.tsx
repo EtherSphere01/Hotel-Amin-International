@@ -10,7 +10,6 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
-// Import auth and booking components
 import GuestRegistrationForm from "@/component/GuestRegistrationForm";
 import { decodeJWT, getToken } from "@/app/utilities/jwt-operation";
 import { generateBookingPDFFromResponse } from "@/app/utilities/pdf-generator";
@@ -27,12 +26,10 @@ export default function RoomCategoriesPage() {
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [roomData, setRoomData] = useState<any[]>([]);
 
-    // Booking states
     const [showGuestForm, setShowGuestForm] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState<any>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    // Booking form states (default values)
     const [checkInDate, setCheckInDate] = useState("");
     const [checkOutDate, setCheckOutDate] = useState("");
     const [guests, setGuests] = useState(1);
@@ -43,7 +40,7 @@ export default function RoomCategoriesPage() {
                 const response = await axios.get(
                     "http://localhost:3000/accommodation/all"
                 );
-                
+
                 const grouped = response.data.reduce((acc: any, room: any) => {
                     const found = acc.find(
                         (cat: any) => cat.category === room.category
@@ -66,7 +63,6 @@ export default function RoomCategoriesPage() {
         };
         fetchRooms();
 
-        // Check authentication status
         checkAuthStatus();
     }, []);
 
@@ -86,7 +82,6 @@ export default function RoomCategoriesPage() {
 
     const handleBookNow = (room: any) => {
         setSelectedRoom(room);
-        // Set default dates (today and tomorrow) if not already set
         if (!checkInDate || !checkOutDate) {
             const today = new Date();
             const tomorrow = new Date(today);

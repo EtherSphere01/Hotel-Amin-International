@@ -261,7 +261,6 @@ const Home = () => {
 
     return (
         <>
-            {/* Hero Section */}
             <div
                 className="hero min-h-screen bg-cover bg-center"
                 style={{ backgroundImage: "url(/images/home/home-hero.jpeg)" }}
@@ -422,10 +421,8 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* Accommodation Slider */}
             <AccommodationSlider />
 
-            {/*Services  Section */}
             <div className="py-14 px-4 md:px-16 lg:px-24 bg-blue-50">
                 <h2 className="text-3xl font-bold text-blue-900 text-center mb-10">
                     HOTEL SERVICES AND FACILITIES
@@ -535,12 +532,9 @@ const Home = () => {
                     DISCOVER COX’S BAZAR
                 </h2>
             </div>
-            {/* Discover Section */}
+
             <DiscoverSection />
 
-            {/* Feedback Section */}
-
-            {/* Customer Reviews Section */}
             <div className="py-14 px-4 md:px-16 lg:px-24 bg-white">
                 <div className="text-center mb-12">
                     <h2 className="text-3xl font-bold text-[#0B3C5D] mb-4">
@@ -558,7 +552,6 @@ const Home = () => {
                         </div>
                     ) : reviews.length > 0 ? (
                         <>
-                            {/* Main Review Display */}
                             <div className="text-center mb-8">
                                 <div className="mb-6">
                                     {renderStars(reviews[0].rating)}
@@ -581,7 +574,6 @@ const Home = () => {
                                 </div>
                             </div>
 
-                            {/* Additional Reviews Thumbnails */}
                             {reviews.length > 1 && (
                                 <div className="flex justify-center items-center space-x-4 mb-8">
                                     {reviews
@@ -603,7 +595,6 @@ const Home = () => {
                                 </div>
                             )}
 
-                            {/* Navigation Dots */}
                             {reviews.length > 1 && (
                                 <div className="flex justify-center space-x-2">
                                     {reviews.slice(0, 5).map((_, index) => (
@@ -633,7 +624,6 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* FAQ Section */}
             <div className="py-14 px-4 md:px-16 lg:px-24 bg-white">
                 <h2 className="text-3xl font-bold text-center mb-10">
                     Frequently Asked{" "}
@@ -641,7 +631,6 @@ const Home = () => {
                 </h2>
 
                 <div className="flex flex-col md:flex-row gap-10 items-center justify-between">
-                    {/* Question Mark Image */}
                     <div className="w-full md:w-1/2 flex justify-center">
                         <div className="relative w-[260px] h-[260px]">
                             <Image
@@ -655,7 +644,6 @@ const Home = () => {
                         </div>
                     </div>
 
-                    {/* FAQ Collapsible Section */}
                     <div className="w-full md:w-1/2 space-y-4">
                         {faqs.map((faq, index) => (
                             <div

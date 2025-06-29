@@ -19,10 +19,8 @@ const decodeJWT = (): any => {
     if (!tokenString) return null;
 
     try {
-        // Parse the token from JSON string
         const token = JSON.parse(tokenString);
 
-        // Decode the JWT payload
         const payload = JSON.parse(atob(token.split(".")[1]));
 
         const currentTime = Math.floor(Date.now() / 1000);
