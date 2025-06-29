@@ -15,10 +15,14 @@ const getRole = (accessToken: string, refreshToken: string): string => {
 
 const decodeJWT = (): any => {
     if (typeof window === "undefined") return null;
-    const token = localStorage.getItem("accessToken");
-    if (!token) return null;
+    const tokenString = localStorage.getItem("accessToken");
+    if (!tokenString) return null;
 
     try {
+        // Parse the token from JSON string
+        const token = JSON.parse(tokenString);
+
+        // Decode the JWT payload
         const payload = JSON.parse(atob(token.split(".")[1]));
 
         const currentTime = Math.floor(Date.now() / 1000);
@@ -26,10 +30,10 @@ const decodeJWT = (): any => {
             return null;
         }
         return {
-            id: Number(payload.user_id),
+            id: Number(payload.sub),
             email: payload.email,
             role: payload.role,
-            full_name: payload.full_name,
+            phone: payload.phone,
         };
     } catch (err) {
         return null;

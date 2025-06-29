@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   JoinColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
@@ -14,6 +15,7 @@ import { Accounts } from './accounts.entity';
 import { RestaurantHistory } from '../../restaurant/entities/restaurant-history.entity';
 import { CouponUsage } from '../../coupon/entities/coupon-usage.entity';
 import { HousekeepingHistory } from '../../housekeeping/entities/housekeeping-history.entity';
+import { BookingReview } from '../../feedback/entities/booking-review.entity';
 
 export enum PaymentStatus {
   PENDING = 'pending',
@@ -88,4 +90,7 @@ export class Booking {
 
   @OneToMany(() => HousekeepingHistory, (history) => history.booking)
   housekeepingHistory: HousekeepingHistory[];
+
+  @OneToOne(() => BookingReview, (review) => review.booking, { nullable: true })
+  review?: BookingReview;
 }

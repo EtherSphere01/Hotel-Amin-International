@@ -26,6 +26,7 @@ import {
 } from "react-icons/fa";
 import AccommodationSlider from "./AccommodationSlider";
 import DiscoverSection from "./DiscoverySection";
+import CustomerReviews from "./CustomerReviews";
 
 // Fake FAQs data
 const faqs = [
@@ -465,6 +466,9 @@ const Home = () => {
             <DiscoverSection />
 
             {/* Feedback Section */}
+
+            {/* Customer Reviews Section */}
+            <CustomerReviews />
 
             {/* FAQ Section */}
             <div className="py-14 px-4 md:px-16 lg:px-24 bg-white">

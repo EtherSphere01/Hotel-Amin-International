@@ -95,7 +95,7 @@ export default function SignInPage({
                         }
 
                         if (role === "admin") {
-                            router.push("/");
+                            router.push("/dashboard");
                         } else {
                             router.push("/");
                         }

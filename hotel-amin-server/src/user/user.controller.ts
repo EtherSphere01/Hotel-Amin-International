@@ -34,6 +34,29 @@ export class UserController {
     return this.userService.getAllUsers();
   }
 
+  @Get('profile')
+  @Auth(AuthType.Bearer)
+  async getProfile(@ActiveUser() user: ActiveUserData) {
+    return this.userService.findUserById(user.sub);
+  }
+
+  @Patch('profile')
+  @Auth(AuthType.Bearer)
+  async updateProfile(
+    @ActiveUser() user: ActiveUserData,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    return this.userService.updateProfile(user.sub, updateProfileDto);
+  }
+
+  @Get('booking-history')
+  @Auth(AuthType.Bearer)
+  async getBookingHistory(@ActiveUser() user: ActiveUserData) {
+    console.log('Booking history endpoint called for user:', user);
+    console.log('User ID:', user.sub);
+    return this.userService.getUserBookingHistory(user.sub);
+  }
+
   @Auth(AuthType.None)
   @Get(':id')
   async getUserById(@Param('id', ParseIntPipe) id: number) {
@@ -65,28 +88,5 @@ export class UserController {
   @Delete('delete/:id')
   async deleteUser(@Param('id', ParseIntPipe) id: number) {
     return this.userService.deleteUser(id);
-  }
-
-  @Get('profile')
-  @Auth(AuthType.Bearer)
-  async getProfile(@ActiveUser() user: ActiveUserData) {
-    return this.userService.findUserById(user.sub);
-  }
-
-  @Patch('profile')
-  @Auth(AuthType.Bearer)
-  async updateProfile(
-    @ActiveUser() user: ActiveUserData,
-    @Body() updateProfileDto: UpdateProfileDto,
-  ) {
-    return this.userService.updateProfile(user.sub, updateProfileDto);
-  }
-
-  @Get('booking-history')
-  @Auth(AuthType.Bearer)
-  async getBookingHistory(@ActiveUser() user: ActiveUserData) {
-    console.log('Booking history endpoint called for user:', user);
-    console.log('User ID:', user.sub);
-    return this.userService.getUserBookingHistory(user.sub);
   }
 }

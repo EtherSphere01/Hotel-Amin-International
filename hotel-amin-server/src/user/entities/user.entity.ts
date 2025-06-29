@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { Booking } from '../../booking/entities/booking.entity';
 import { Feedback } from '../../feedback/entities/feedback.entity';
+import { BookingReview } from '../../feedback/entities/booking-review.entity';
 import { Reservation } from '../../reservation/entities/reservation.entity';
 
 @Entity('User')
@@ -67,6 +68,9 @@ export class User {
 
   @OneToMany(() => Feedback, (feedback) => feedback.user)
   feedbacks: Feedback[];
+
+  @OneToMany(() => BookingReview, (review) => review.user)
+  bookingReviews: BookingReview[];
 
   @OneToMany(() => Reservation, (reservation) => reservation.user)
   reservations: Reservation[];
