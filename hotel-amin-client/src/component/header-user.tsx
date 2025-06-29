@@ -102,13 +102,13 @@ const HeaderUser = () => {
     const handleSignInButton = (value: boolean) => {
         console.log("Sign In button clicked:", value);
         setSignInButton(value);
-        if (value) setSignUpButton(false); 
+        if (value) setSignUpButton(false);
     };
 
     const handleSignUpButton = (value: boolean) => {
         console.log("Sign Up button clicked:", value);
         setSignUpButton(value);
-        if (value) setSignInButton(false); 
+        if (value) setSignInButton(false);
     };
 
     useEffect(() => {
@@ -389,7 +389,7 @@ const HeaderUser = () => {
                                     <Link
                                         key={link.href}
                                         href={link.href}
-                                        onClick={() => setMenuOpen(false)} 
+                                        onClick={() => setMenuOpen(false)}
                                         className={`cursor-pointer ${
                                             pathname === link.href
                                                 ? "text-white font-bold underline"
@@ -496,12 +496,12 @@ const HeaderUser = () => {
                 </div>
             )}
 
-            {process.env.NODE_ENV === "development" && (
+            {/* {process.env.NODE_ENV === "development" && (
                 <div className="fixed bottom-4 left-4 bg-black text-white p-2 text-xs z-50">
                     SignIn: {signinButton ? "true" : "false"} | SignUp:{" "}
                     {signupButton ? "true" : "false"}
                 </div>
-            )}
+            )} */}
         </header>
     );
 };
