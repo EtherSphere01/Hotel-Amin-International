@@ -1,4 +1,10 @@
-import { Body, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Body,
+  Inject,
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Feedback } from './entities/feedback.entity';
@@ -81,7 +87,7 @@ export class FeedbackService {
       where: { booking: { booking_id: createBookingReviewDto.booking_id } },
     });
     if (existingReview) {
-      throw new NotFoundException('Review already exists for this booking');
+      throw new BadRequestException('Review already exists for this booking');
     }
 
     const review = this.bookingReviewRepository.create({

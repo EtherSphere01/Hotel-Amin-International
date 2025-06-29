@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -26,7 +26,24 @@ import {
 } from "react-icons/fa";
 import AccommodationSlider from "./AccommodationSlider";
 import DiscoverSection from "./DiscoverySection";
-import CustomerReviews from "./CustomerReviews";
+
+// Interfaces
+interface BookingReview {
+    review_id: number;
+    review_text: string;
+    rating: number;
+    guest_name: string;
+    created_date: string;
+    user: {
+        user_id: number;
+        name: string;
+    };
+    booking: {
+        booking_id: number;
+        checkin_date: string;
+        checkout_date: string;
+    };
+}
 
 // Fake FAQs data
 const faqs = [
@@ -92,11 +109,67 @@ const Home = () => {
         guests: 1,
     });
     const [isSearching, setIsSearching] = useState(false);
+    const [reviews, setReviews] = useState<BookingReview[]>([]);
+    const [reviewsLoading, setReviewsLoading] = useState(true);
 
     // Helper function to get today's date in YYYY-MM-DD format
     const getTodayDate = () => {
         const today = new Date();
         return today.toISOString().split("T")[0];
+    };
+
+    // Fetch reviews on component mount
+    useEffect(() => {
+        fetchBookingReviews();
+    }, []);
+
+    const fetchBookingReviews = async () => {
+        try {
+            console.log("Fetching booking reviews from API...");
+            const response = await fetch(
+                "http://localhost:3000/feedback/booking-reviews",
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            console.log("Reviews API response status:", response.status);
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Reviews data received:", data);
+                console.log("Number of reviews:", data.length);
+                setReviews(data.slice(0, 6)); // Show only latest 6 reviews
+            } else {
+                console.error(
+                    "Failed to fetch reviews - Status:",
+                    response.status
+                );
+                const errorText = await response.text();
+                console.error("Error response:", errorText);
+            }
+        } catch (error) {
+            console.error("Error fetching reviews:", error);
+        } finally {
+            setReviewsLoading(false);
+        }
+    };
+
+    const renderStars = (rating: number) => {
+        return (
+            <div className="flex items-center justify-center space-x-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                    <FaStar
+                        key={star}
+                        className={`h-4 w-4 ${
+                            star <= rating ? "text-yellow-400" : "text-gray-300"
+                        }`}
+                    />
+                ))}
+            </div>
+        );
     };
 
     const handleSearchInputChange = (
@@ -468,7 +541,97 @@ const Home = () => {
             {/* Feedback Section */}
 
             {/* Customer Reviews Section */}
-            <CustomerReviews />
+            <div className="py-14 px-4 md:px-16 lg:px-24 bg-white">
+                <div className="text-center mb-12">
+                    <h2 className="text-3xl font-bold text-[#0B3C5D] mb-4">
+                        WHAT OUR CUSTOMER SAY
+                    </h2>
+                </div>
+
+                <div className="max-w-4xl mx-auto">
+                    {reviewsLoading ? (
+                        <div className="text-center py-12">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0B3C5D] mx-auto"></div>
+                            <p className="mt-4 text-gray-600">
+                                Loading reviews...
+                            </p>
+                        </div>
+                    ) : reviews.length > 0 ? (
+                        <>
+                            {/* Main Review Display */}
+                            <div className="text-center mb-8">
+                                <div className="mb-6">
+                                    {renderStars(reviews[0].rating)}
+                                </div>
+                                <div className="mb-4">
+                                    <div className="w-20 h-20 mx-auto mb-4 bg-gray-300 rounded-full flex items-center justify-center">
+                                        <span className="text-2xl font-bold text-gray-600">
+                                            {reviews[0].guest_name.charAt(0)}
+                                        </span>
+                                    </div>
+                                    <h3 className="text-xl font-semibold text-[#0B3C5D] mb-2">
+                                        {reviews[0].guest_name}
+                                    </h3>
+                                </div>
+                                <p className="text-gray-700 text-lg italic max-w-3xl mx-auto leading-relaxed">
+                                    "{reviews[0].review_text}"
+                                </p>
+                                <div className="mt-4 text-sm text-gray-500">
+                                    -- {reviews[0].guest_name} --
+                                </div>
+                            </div>
+
+                            {/* Additional Reviews Thumbnails */}
+                            {reviews.length > 1 && (
+                                <div className="flex justify-center items-center space-x-4 mb-8">
+                                    {reviews
+                                        .slice(1, 5)
+                                        .map((review, index) => (
+                                            <div
+                                                key={review.review_id}
+                                                className="flex-shrink-0"
+                                            >
+                                                <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
+                                                    <span className="text-sm font-bold text-gray-600">
+                                                        {review.guest_name.charAt(
+                                                            0
+                                                        )}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                </div>
+                            )}
+
+                            {/* Navigation Dots */}
+                            {reviews.length > 1 && (
+                                <div className="flex justify-center space-x-2">
+                                    {reviews.slice(0, 5).map((_, index) => (
+                                        <button
+                                            key={index}
+                                            className={`w-2 h-2 rounded-full ${
+                                                index === 0
+                                                    ? "bg-[#F5A623]"
+                                                    : "bg-gray-300"
+                                            }`}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <div className="text-center py-12">
+                            <div className="w-20 h-20 mx-auto mb-4 bg-gray-200 rounded-full flex items-center justify-center">
+                                <FaStar className="text-2xl text-gray-400" />
+                            </div>
+                            <p className="text-gray-500 italic">
+                                No customer reviews yet. Be the first to share
+                                your experience!
+                            </p>
+                        </div>
+                    )}
+                </div>
+            </div>
 
             {/* FAQ Section */}
             <div className="py-14 px-4 md:px-16 lg:px-24 bg-white">
