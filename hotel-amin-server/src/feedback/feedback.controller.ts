@@ -5,6 +5,7 @@ import { CreateBookingReviewDto } from './DTOs/create-booking-review.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { AuthType } from 'src/auth/enums/auth-type.enum';
 
+@Auth(AuthType.None)
 @Controller('feedback')
 export class FeedbackController {
   constructor(private readonly feedbackService: FeedbackService) {}

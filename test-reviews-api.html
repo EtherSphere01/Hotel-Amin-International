@@ -1,9 +1,0 @@
-// Simple test to check booking reviews endpoint console.log('Testing booking
-reviews API endpoint directly...');
-fetch('http://localhost:3000/feedback/booking-reviews') .then(response => {
-console.log('Response status:', response.status); if (response.ok) { return
-response.json(); } else { throw new Error(`HTTP ${response.status}`); } })
-.then(data => { console.log('✅ API endpoint is working'); console.log('Reviews
-found:', data.length); console.log('Sample data:', data); }) .catch(error => {
-console.log('❌ API endpoint test failed:', error.message); console.log('Make
-sure the server is running on http://localhost:3000'); });

@@ -111,7 +111,7 @@ const DiscoverSection = () => {
                         <div className="rounded-xl overflow-hidden bg-white shadow-lg mb-6 mx-2">
                             <div className="relative w-full h-56">
                                 <Image
-                                    src="/images/rooms/public-hero.png"
+                                    src={place.imageUrl}
                                     alt={place.title}
                                     fill
                                     className="object-cover"

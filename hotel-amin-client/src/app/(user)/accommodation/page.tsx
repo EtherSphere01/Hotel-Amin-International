@@ -43,7 +43,7 @@ export default function RoomCategoriesPage() {
                 const response = await axios.get(
                     "http://localhost:3000/accommodation/all"
                 );
-                // Optional: group by category
+                
                 const grouped = response.data.reduce((acc: any, room: any) => {
                     const found = acc.find(
                         (cat: any) => cat.category === room.category
